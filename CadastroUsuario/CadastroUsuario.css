@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap');
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background-color: #f6f7f8;
+  color: #222;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container */
+.register-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.register-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  color: #137fec;
+}
+
+.logo-area h2 {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Nav */
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  font-size: 14px;
+  color: #444;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover {
+  color: #137fec;
+}
+
+/* Botão login header */
+.btn-login {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  background: #f2f2f2;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-login:hover {
+  background: #e6e6e6;
+}
+
+/* Main */
+.register-main {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+/* Card */
+.register-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 32px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border: 1px solid #ddd;
+}
+
+.register-card h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.register-card p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  border-color: #137fec;
+  box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.2);
+}
+
+/* Botão */
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: #137fec;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #0f6ac2;
+}
+
+/* Texto final */
+.already-account {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.already-account .link-primary {
+  color: #137fec;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.already-account .link-primary:hover {
+  text-decoration: underline;
+}
