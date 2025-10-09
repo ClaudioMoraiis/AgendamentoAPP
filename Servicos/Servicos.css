@@ -1,0 +1,91 @@
+/* Estilos básicos para a tela de serviços */
+
+.servicos-root {
+  font-family: 'Manrope', sans-serif;
+  background: linear-gradient(135deg, #eaf3fb 0%, #f6f7f8 60%, #dbeafe 100%);
+  min-height: 100vh;
+  padding: 2.5rem 0 3rem 0;
+}
+.servicos-title {
+  text-align: center;
+  font-size: 2.3rem;
+  font-weight: 900;
+  margin-bottom: 2.5rem;
+  color: #137fec;
+  letter-spacing: -1.5px;
+  text-shadow: 0 2px 12px #137fec22;
+}
+.servicos-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.2rem;
+  justify-content: center;
+}
+.servico-card {
+  background: rgba(255,255,255,0.97);
+  border-radius: 1.3rem;
+  box-shadow: 0 8px 32px rgba(19,127,236,0.13);
+  padding: 2.2rem 1.7rem 1.7rem 1.7rem;
+  min-width: 240px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.servico-card:before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(120deg, #eaf3fb33 0%, #137fec11 100%);
+  z-index: 0;
+  border-radius: 1.3rem;
+}
+.servico-card:hover {
+  box-shadow: 0 16px 40px rgba(19,127,236,0.18);
+  transform: translateY(-3px) scale(1.025);
+}
+.servico-icone {
+  font-size: 2.7rem;
+  margin-bottom: 1.1rem;
+  z-index: 1;
+}
+.servico-nome {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: #137fec;
+  z-index: 1;
+  text-align: center;
+}
+.servico-descricao {
+  font-size: 1.08rem;
+  color: #6b7280;
+  margin-bottom: 1.2rem;
+  z-index: 1;
+  text-align: center;
+}
+.servico-preco {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #22c55e;
+  background: #e6fbe9;
+  border-radius: 0.7rem;
+  padding: 0.4rem 1.1rem;
+  margin-top: 0.5rem;
+  z-index: 1;
+  box-shadow: 0 1px 4px #22c55e22;
+}
+
+@media (max-width: 700px) {
+  .servicos-list {
+    gap: 1.2rem;
+  }
+  .servico-card {
+    min-width: 90vw;
+    max-width: 98vw;
+    padding: 1.5rem 0.7rem 1.2rem 0.7rem;
+  }
+}

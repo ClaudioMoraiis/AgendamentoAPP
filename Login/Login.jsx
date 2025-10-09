@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./Login.css"; // Importa o CSS puro
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -57,10 +57,11 @@ const Login = () => {
                 required
               />
             </div>
-
-            <button type="submit" className="btn-primary">
+          <button type="button" className="btn-primary">
+            <Link to="/agendamento" className="link-btn">
               Entrar
-            </button>
+            </Link>
+          </button>
           </form>
 
           <div className="extra-links">

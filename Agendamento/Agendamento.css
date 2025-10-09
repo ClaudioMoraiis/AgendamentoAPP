@@ -1,0 +1,350 @@
+/* Ajuste visual para o react-calendar */
+.agendamento-calendar-component {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  border-radius: 0.75rem;
+  box-shadow: none;
+  font-family: 'Manrope', sans-serif;
+  background: #f6f7f8;
+  border: none;
+  padding: 1rem 0.5rem;
+}
+.agendamento-calendar-component .react-calendar__tile {
+  border-radius: 9999px;
+  height: 2.5rem;
+  max-width: 2.5rem;
+  font-size: 1rem;
+  margin: 0.1rem auto;
+}
+.agendamento-calendar-component .react-calendar__month-view__weekdays {
+  font-weight: bold;
+  color: #6b7280;
+  text-align: center;
+}
+.agendamento-calendar-component .react-calendar__tile--active,
+.agendamento-calendar-component .react-calendar__tile--now {
+  background: #137fec;
+  color: #fff;
+}
+.agendamento-calendar-component .react-calendar__tile:disabled {
+  color: #9ca3af;
+  background: #f6f7f8;
+  text-decoration: line-through;
+}
+.agendamento-calendar-component .react-calendar__navigation button {
+  min-width: 2rem;
+  background: none;
+  border-radius: 9999px;
+  border: none;
+  font-size: 1.2rem;
+  color: #137fec;
+  padding: 0.25rem 0.5rem;
+  transition: background 0.2s;
+}
+.agendamento-calendar-component .react-calendar__navigation button:enabled:hover {
+  background: #e6f2fd;
+}
+.agendamento-root {
+  font-family: 'Manrope', sans-serif;
+  background: #f6f7f8;
+  color: #111418;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.agendamento-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.agendamento-header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  justify-content: space-between;
+}
+.agendamento-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.agendamento-logo {
+  width: 2rem;
+  height: 2rem;
+  color: #137fec;
+}
+.agendamento-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+.agendamento-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.agendamento-nav-link {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.agendamento-nav-link:hover,
+.agendamento-nav-link.active {
+  color: #137fec;
+}
+.agendamento-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.agendamento-bell-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.agendamento-bell-btn:hover {
+  background: #e6f2fd;
+}
+.agendamento-bell-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #6b7280;
+}
+.agendamento-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDMAMHwJEQZdOm4TQHIW-6K9DQD6gJucruGmc9FdPodGlBWrJv0aWdXYDrhXR0J6ne-frvb6vKsTo2OxnZIXtUfmM8AyoiHaiQLyYSs6xl429yJKv4XfYqqHgr-vdJAT-KhB5oOTfWb3VLfZaidCLXYLuBXe9Sll5hKXNox3_5V1ozDPzga6dCti-ziuIaO6S2POY_j42rLw_yhP8hgerS-iXJWHjpurgLKzYrPj-8S4HWkc-YkGRDq2D3Om8L6M9Nui1cm5FW3kNcB') center/cover no-repeat;
+}
+.agendamento-main {
+  flex: 1;
+  padding: 2rem 0;
+  background: #f6f7f8;
+}
+.agendamento-card {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(16, 25, 34, 0.08);
+  padding: 2rem;
+}
+.agendamento-section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+.agendamento-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.agendamento-label {
+  display: block;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #6b7280;
+}
+.agendamento-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  background: #f6f7f8;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 1rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+}
+.agendamento-calendar-card {
+  background: #f6f7f8;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+.agendamento-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.agendamento-calendar-title {
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+.agendamento-calendar-nav-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.agendamento-calendar-nav-btn:hover {
+  background: #e6f2fd;
+}
+.agendamento-calendar-nav-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6b7280;
+}
+.agendamento-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+.agendamento-calendar-day-header {
+  font-weight: bold;
+  color: #6b7280;
+}
+.agendamento-calendar-day {
+  padding: 0.5rem 0;
+  border-radius: 9999px;
+}
+.agendamento-calendar-day.muted {
+  color: #9ca3af;
+}
+.agendamento-calendar-day.success {
+  background: rgba(34, 197, 94, 0.12);
+}
+.agendamento-calendar-day.danger {
+  background: rgba(239, 68, 68, 0.12);
+}
+.agendamento-calendar-day-btn {
+  font-weight: 500;
+  background: none;
+  border: none;
+  border-radius: 9999px;
+  aspect-ratio: 1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.agendamento-calendar-day-btn:hover {
+  background: #e6f2fd;
+}
+.agendamento-calendar-day-btn.selected {
+  background: #137fec;
+  color: #fff;
+  font-weight: bold;
+}
+.agendamento-horarios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.agendamento-horario-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.75rem;
+  background: #f6f7f8;
+  border: 1px solid #e5e7eb;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s;
+}
+.agendamento-horario-btn.selected {
+  background: #137fec;
+  color: #fff;
+  border-color: #137fec;
+  font-weight: 600;
+}
+.agendamento-horario-btn.disabled,
+.agendamento-horario-btn:disabled {
+  color: #9ca3af;
+  background: #f6f7f8;
+  border: 1px solid #e5e7eb;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.agendamento-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+.agendamento-agendar-btn {
+  background: #137fec;
+  color: #fff;
+  font-weight: bold;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.agendamento-agendar-btn:hover {
+  background: #0e6bc7;
+}
+.agendamento-confirmacao {
+  margin-top: 2rem;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1.5rem;
+}
+.agendamento-confirmacao-msg {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.agendamento-confirmacao-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.agendamento-confirmacao-text {
+  font-weight: 500;
+}
+.agendamento-confirmacao-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.agendamento-cancelar-btn {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  color: #111418;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.agendamento-cancelar-btn:hover {
+  background: #f6f7f8;
+}
+.agendamento-reagendar-btn {
+  background: rgba(19, 127, 236, 0.1);
+  color: #137fec;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.agendamento-reagendar-btn:hover {
+  background: rgba(19, 127, 236, 0.2);
+}

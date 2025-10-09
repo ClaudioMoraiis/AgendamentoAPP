@@ -123,7 +123,7 @@ const Register = () => {
 
                     <p className="already-account">
                         Já possui uma conta?{" "}
-                        <a href="/login" className="link-primary">
+                        <a href="/" className="link-primary">
                             Entrar
                         </a>
                     </p>

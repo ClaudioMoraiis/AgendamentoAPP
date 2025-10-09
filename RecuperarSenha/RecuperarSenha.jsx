@@ -31,7 +31,7 @@ const RecuperarSenha = () => {
           </div>
           <h2>BarberApp</h2>
         </div>
-        <Link to="/login" className="btn-login">Login</Link>
+        <Link to="/" className="btn-login">Login</Link>
       </header>
 
       <main className="recover-main">
@@ -58,7 +58,7 @@ const RecuperarSenha = () => {
           </form>
 
           <p className="already-account">
-            Lembrou sua senha? <Link to="/login" className="link-primary">Faça login</Link>
+            Lembrou sua senha? <Link to="/" className="link-primary">Faça login</Link>
           </p>
         </div>
       </main>

@@ -45,7 +45,7 @@ const AlterarSenha = () => {
           </div>
           <h2>AgendamentoAPP</h2>
         </div>
-        <Link to="/login" className="btn-login">Ir para Login</Link>
+        <Link to="/" className="btn-login">Ir para Login</Link>
       </header>
 
       <main className="change-main">
