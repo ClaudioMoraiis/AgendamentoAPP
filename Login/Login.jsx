@@ -6,9 +6,17 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Email:", email, "Password:", password);
+    // Lógica fictícia de autenticação
+    if (email === "admin@admin.com" && password === "admin") {
+      localStorage.setItem("role", "admin");
+      navigate("/gerenciamento-servicos");
+    } else {
+      localStorage.setItem("role", "cliente");
+      navigate("/agendamento");
+    }
   };
 
   return (
@@ -32,6 +40,7 @@ const Login = () => {
       <main className="login-main">
         <div className="login-card">
           <h2>Bem vindo de volta</h2>
+
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -57,11 +66,9 @@ const Login = () => {
                 required
               />
             </div>
-          <button type="button" className="btn-primary">
-            <Link to="/agendamento" className="link-btn">
+            <button type="submit" className="btn-primary">
               Entrar
-            </Link>
-          </button>
+            </button>
           </form>
 
           <div className="extra-links">

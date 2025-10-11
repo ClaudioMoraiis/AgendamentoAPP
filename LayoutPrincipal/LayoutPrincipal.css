@@ -1,0 +1,207 @@
+/* Variáveis CSS */
+:root {
+  --primary: #137fec;
+  --primary-dark: #0e6bc7;
+  --background-light: #f6f7f8;
+  --background-dark: #101922;
+  --foreground-light: #111827;
+  --foreground-dark: #f9fafb;
+  --subtle-light: #6b7280;
+  --subtle-dark: #9ca3af;
+  --border-light: #e5e7eb;
+  --border-dark: #374151;
+  --white: #ffffff;
+}
+
+/* Layout Root */
+.layout-root {
+  display: flex;
+  min-height: 100vh;
+  background: var(--background-light);
+  font-family: "Manrope", sans-serif;
+  position: relative;
+}
+
+/* Botão hamburguer */
+.layout-menu-btn {
+  display: none;
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 1201;
+  background: var(--white);
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(19, 127, 236, 0.133);
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.hidden-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Sidebar */
+.layout-sidebar {
+  width: 260px;
+  background: var(--white);
+  border-right: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  justify-content: space-between;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  height: 100vh;
+  z-index: 1200;
+  box-shadow: 2px 0 16px rgba(19, 127, 236, 0.133);
+  transition: transform 0.35s ease, opacity 0.3s ease;
+}
+
+/* Estado fechado (mobile) */
+@media (max-width: 900px) {
+  .layout-sidebar {
+    transform: translateX(-100%);
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .layout-sidebar.open {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .layout-menu-btn {
+    display: flex;
+  }
+
+  .layout-main {
+    margin-left: 0 !important;
+  }
+}
+
+/* Estado aberto (desktop fixo) */
+@media (min-width: 901px) {
+  .layout-sidebar {
+    position: relative;
+    transform: none !important;
+    opacity: 1;
+    visibility: visible;
+    width: 260px;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    box-shadow: none;
+  }
+
+  .layout-menu-btn {
+    display: none !important;
+  }
+
+  .layout-main {
+    margin-left: 0;
+    flex: 1;
+  }
+}
+
+/* Overlay */
+.layout-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 1199;
+  transition: opacity 0.3s ease;
+}
+
+/* Botão fechar */
+.layout-menu-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1300;
+  font-size: 2rem;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.layout-menu-close-btn .material-symbols-outlined {
+  font-size: 2rem;
+  color: var(--primary);
+}
+
+/* Garante que o conteúdo do menu fique sempre acima */
+.layout-sidebar-content {
+  position: relative;
+  z-index: 1301;
+}
+
+/* Navegação */
+.layout-logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 2.5rem;
+}
+
+.layout-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.layout-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 1rem;
+  border-radius: 0.7rem;
+  color: var(--foreground-light);
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s;
+}
+
+.layout-nav-link.active,
+.layout-nav-link:hover {
+  background: rgba(19, 127, 236, 0.133);
+  color: var(--primary);
+}
+
+/* Main content */
+.layout-main {
+  flex: 1;
+  padding: 2.5rem 2rem;
+  background: var(--background-light);
+  min-height: 100vh;
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+  .layout-main {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .layout-main {
+    padding: 0.8rem 0.4rem;
+  }
+}

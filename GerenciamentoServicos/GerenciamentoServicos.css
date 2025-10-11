@@ -1,0 +1,600 @@
+.gs-root {
+  display: flex;
+  min-height: 100vh;
+  background: #f6f7f8;
+  font-family: "Manrope", sans-serif;
+  position: relative;
+}
+
+/* Botão hamburguer */
+.gs-menu-btn {
+  display: none;
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 1201;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px #137fec22;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Some o botão hamburguer quando o menu estiver aberto */
+.hidden-btn {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+
+/* Quando o menu estiver aberto, o botão hamburguer fica atrás */
+.gs-sidebar.open ~ .gs-menu-btn {
+  z-index: 100; /* menor que o menu (z-index 1200) */
+}
+
+.gs-menu-btn .material-symbols-outlined {
+  font-size: 2rem;
+  color: #137fec;
+}
+
+/* Sidebar */
+.gs-sidebar {
+  width: 260px;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  justify-content: space-between;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  height: 100vh;
+  z-index: 1200;
+  box-shadow: 2px 0 16px #137fec22;
+  transition: transform 0.35s ease, opacity 0.3s ease;
+}
+
+/* Estado fechado (mobile) */
+@media (max-width: 900px) {
+  .gs-sidebar {
+    transform: translateX(-100%);
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .gs-sidebar.open {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .gs-menu-btn {
+    display: flex;
+  }
+
+  .gs-main {
+    margin-left: 0 !important;
+  }
+}
+
+/* Estado aberto (desktop fixo) */
+@media (min-width: 901px) {
+  .gs-sidebar {
+    position: relative;
+    transform: none !important;
+    opacity: 1;
+    visibility: visible;
+    width: 260px;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    box-shadow: none;
+  }
+
+  .gs-menu-btn {
+    display: none !important;
+  }
+
+  .gs-main {
+    margin-left: 260px;
+  }
+}
+
+/* Overlay */
+.gs-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 1199;
+  transition: opacity 0.3s ease;
+}
+
+/* Botão fechar */
+.gs-menu-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1300;
+  font-size: 2rem;
+  color: #137fec;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Garante que o conteúdo do menu fique sempre acima */
+.gs-sidebar-content {
+  position: relative;
+  z-index: 1301;
+}
+
+.gs-menu-close-btn .material-symbols-outlined {
+  font-size: 2rem;
+  color: #137fec;
+}
+
+/* Navegação */
+.gs-logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #137fec;
+  margin-bottom: 2.5rem;
+}
+
+.gs-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gs-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 1rem;
+  border-radius: 0.7rem;
+  color: #374151;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s;
+}
+
+.gs-nav-link.active,
+.gs-nav-link:hover {
+  background: #137fec22;
+  color: #137fec;
+}
+
+/* Main content */
+.gs-main {
+  flex: 1;
+  padding: 2.5rem 2rem;
+  background: #f6f7f8;
+}
+
+.gs-main-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* Header */
+.gs-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+.gs-header h2 {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #222;
+}
+.gs-btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #137fec;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  box-shadow: 0 2px 8px #137fec22;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.gs-btn-primary:hover {
+  background: #0e6bc7;
+}
+
+/* Filtros */
+.gs-filtros-card {
+  background: #fff;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 8px #137fec11;
+}
+.gs-filtros-card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #137fec;
+  margin-bottom: 1.2rem;
+}
+.gs-filtros {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+.gs-filtros label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+.gs-filtros select {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 0.7rem;
+  border: 1px solid #e5e7eb;
+  background: #f6f7f8;
+  color: #222;
+  font-size: 1rem;
+}
+
+/* Tabela */
+.gs-table-card {
+  background: #fff;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px #137fec11;
+  overflow-x: auto;
+}
+.gs-table-card table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+.gs-table-card th,
+.gs-table-card td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  font-size: 1rem;
+}
+.gs-table-card th {
+  color: #6b7280;
+  font-weight: 700;
+  background: #f6f7f8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.gs-table-card td {
+  color: #374151;
+  font-weight: 500;
+  background: #fff;
+}
+.gs-table-card tr:not(:last-child) td {
+  border-bottom: 1px solid #e5e7eb;
+}
+.gs-link-edit {
+  color: #137fec;
+  font-weight: 700;
+  text-decoration: none;
+}
+.gs-link-edit:hover {
+  color: #0e6bc7;
+}
+
+/* ===================== */
+/*  RESPONSIVIDADE TOTAL */
+/* ===================== */
+@media (max-width: 900px) {
+  .gs-main {
+    padding: 1rem;
+  }
+
+  .gs-main-content {
+    gap: 1.5rem;
+  }
+
+  .gs-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .gs-header h2 {
+    font-size: 1.6rem;
+  }
+
+  .gs-btn-primary {
+    width: 100%;
+    justify-content: center;
+    font-size: 1rem;
+    padding: 0.8rem;
+  }
+
+  .gs-filtros-card {
+    padding: 1rem;
+  }
+
+  .gs-filtros {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .gs-filtros label {
+    font-size: 0.95rem;
+  }
+
+  .gs-filtros select {
+    font-size: 0.95rem;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .gs-table-card {
+    border-radius: 0.8rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .gs-table-card table {
+    min-width: 450px;
+  }
+
+  .gs-table-card th,
+  .gs-table-card td {
+    font-size: 0.9rem;
+    padding: 0.6rem;
+  }
+}
+
+/* Telas muito pequenas (celulares compactos) */
+@media (max-width: 600px) {
+  .gs-main {
+    padding: 0.8rem 0.4rem;
+  }
+
+  .gs-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .gs-btn-primary {
+    font-size: 0.9rem;
+    padding: 0.6rem;
+  }
+
+  .gs-filtros-card {
+    padding: 0.8rem;
+  }
+
+  .gs-filtros select {
+    font-size: 0.9rem;
+  }
+
+  .gs-table-card th,
+  .gs-table-card td {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+}
+
+/* Telas muito pequenas (até 400px) */
+@media (max-width: 400px) {
+  .gs-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .gs-btn-primary {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.7rem;
+  }
+
+  .gs-filtros-card h3 {
+    font-size: 1rem;
+  }
+
+  .gs-filtros label {
+    font-size: 0.85rem;
+  }
+
+  .gs-filtros select {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  .gs-table-card table {
+    min-width: 380px;
+  }
+}
+
+/* ========================= */
+/*   MODAL DE NOVO SERVIÇO   */
+/* ========================= */
+
+.gs-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1500;
+  animation: fadeIn 0.3s ease;
+}
+
+.gs-modal {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 95%;
+  max-width: 420px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+.gs-modal h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #137fec;
+  margin-bottom: 1.5rem;
+}
+
+.gs-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.gs-modal label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.gs-modal input {
+  padding: 0.7rem 1rem;
+  border-radius: 0.7rem;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 1rem;
+}
+
+.gs-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.gs-modal-buttons button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.gs-modal-buttons .cancelar {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.gs-modal-buttons .salvar {
+  background: #137fec;
+  color: #fff;
+}
+
+.gs-modal-buttons .salvar:hover {
+  background: #0e6bc7;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Botão de editar na tabela */
+.gs-link-edit {
+  background: none;
+  border: none;
+  color: #137fec;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+}
+
+.gs-link-edit:hover {
+  color: #0e6bc7;
+  text-decoration: underline;
+}
+
+/* Botão excluir no modal de edição */
+.gs-modal-buttons .excluir {
+  background: #dc2626;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  margin-right: auto;
+}
+
+.gs-modal-buttons .excluir:hover {
+  background: #b91c1c;
+}
+
+.gs-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Responsividade para o modal de edição */
+@media (max-width: 600px) {
+  .gs-modal-buttons {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .gs-modal-buttons .excluir {
+    margin-right: 0;
+    width: 100%;
+    order: 3;
+  }
+  
+  .gs-modal-buttons > div {
+    display: flex;
+    gap: 0.8rem;
+    width: 100%;
+  }
+  
+  .gs-modal-buttons > div button {
+    flex: 1;
+  }
+}
