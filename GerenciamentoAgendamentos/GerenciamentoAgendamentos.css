@@ -291,8 +291,9 @@
   color: var(--subtle-light);
 }
 
-/* Selects */
-.ga-select {
+/* Selects e Inputs */
+.ga-select,
+.ga-input {
   width: 100%;
   height: 2.5rem;
   padding: 0 0.75rem;
@@ -301,14 +302,46 @@
   background: var(--white);
   font-size: 0.875rem;
   color: var(--foreground-light);
-  cursor: pointer;
   transition: all 0.2s;
 }
 
-.ga-select:focus {
+.ga-select {
+  cursor: pointer;
+}
+
+.ga-input {
+  cursor: text;
+}
+
+.ga-select:focus,
+.ga-input:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(19, 127, 236, 0.1);
+}
+
+/* Indicador de resultados */
+.ga-results-indicator {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-left: 4px solid var(--primary);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ga-results-text {
+  font-size: 0.875rem;
+  color: #0c4a6e;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ga-results-text::before {
+  content: "📊";
+  font-size: 1rem;
 }
 
 /* Tabela */

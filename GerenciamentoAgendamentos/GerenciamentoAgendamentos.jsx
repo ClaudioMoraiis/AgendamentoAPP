@@ -81,6 +81,8 @@ export default function GerenciamentoAgendamentos() {
   const [busca, setBusca] = useState("");
   const [profissionalFiltro, setProfissionalFiltro] = useState("Todos");
   const [periodoFiltro, setPeriodoFiltro] = useState("Esta semana");
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalEditarOpen, setModalEditarOpen] = useState(false);
   const [agendamentoEditando, setAgendamentoEditando] = useState(null);
@@ -129,7 +131,7 @@ export default function GerenciamentoAgendamentos() {
       profissionalFiltro === "Todos" || 
       agendamento.profissional === profissionalFiltro;
 
-    // Filtro de período (simplificado para demonstração)
+    // Filtro de período
     const hoje = new Date();
     const dataAgendamento = new Date(agendamento.data);
     
@@ -145,12 +147,29 @@ export default function GerenciamentoAgendamentos() {
         fimSemana.setDate(inicioSemana.getDate() + 6);
         periodoMatch = dataAgendamento >= inicioSemana && dataAgendamento <= fimSemana;
         break;
+      case "Este mês":
+        const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+        const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+        periodoMatch = dataAgendamento >= inicioMes && dataAgendamento <= fimMes;
+        break;
       case "Próxima semana":
         const inicioProxima = new Date(hoje);
         inicioProxima.setDate(hoje.getDate() + (7 - hoje.getDay()));
         const fimProxima = new Date(inicioProxima);
         fimProxima.setDate(inicioProxima.getDate() + 6);
         periodoMatch = dataAgendamento >= inicioProxima && dataAgendamento <= fimProxima;
+        break;
+      case "Personalizado":
+        if (dataInicio && dataFim) {
+          const inicio = new Date(dataInicio);
+          const fim = new Date(dataFim);
+          // Adiciona 23:59:59 ao fim do dia para incluir todo o dia final
+          fim.setHours(23, 59, 59, 999);
+          periodoMatch = dataAgendamento >= inicio && dataAgendamento <= fim;
+        } else {
+          // Se não há datas definidas, mostra todos
+          periodoMatch = true;
+        }
         break;
       default:
         periodoMatch = true;
@@ -296,7 +315,14 @@ export default function GerenciamentoAgendamentos() {
               <label>Período</label>
               <select 
                 value={periodoFiltro} 
-                onChange={(e) => setPeriodoFiltro(e.target.value)}
+                onChange={(e) => {
+                  setPeriodoFiltro(e.target.value);
+                  // Limpa as datas se não for período personalizado
+                  if (e.target.value !== "Personalizado") {
+                    setDataInicio("");
+                    setDataFim("");
+                  }
+                }}
                 className="ga-select"
               >
                 {periodos.map(periodo => (
@@ -304,7 +330,45 @@ export default function GerenciamentoAgendamentos() {
                 ))}
               </select>
             </div>
+
+            {/* Campos de data personalizada */}
+            {periodoFiltro === "Personalizado" && (
+              <>
+                <div className="ga-filtro-group">
+                  <label>Data Início</label>
+                  <input
+                    type="date"
+                    value={dataInicio}
+                    onChange={(e) => setDataInicio(e.target.value)}
+                    className="ga-input"
+                    placeholder="Data inicial"
+                  />
+                </div>
+                <div className="ga-filtro-group">
+                  <label>Data Fim</label>
+                  <input
+                    type="date"
+                    value={dataFim}
+                    onChange={(e) => setDataFim(e.target.value)}
+                    className="ga-input"
+                    placeholder="Data final"
+                    min={dataInicio} // Não permite data fim menor que início
+                  />
+                </div>
+              </>
+            )}
           </div>
+          
+          {/* Indicador de resultados */}
+          {periodoFiltro === "Personalizado" && dataInicio && dataFim && (
+            <div className="ga-results-indicator">
+              <span className="ga-results-text">
+                Exibindo {agendamentosFiltrados.length} agendamento(s) entre {' '}
+                {new Date(dataInicio).toLocaleDateString('pt-BR')} e {' '}
+                {new Date(dataFim).toLocaleDateString('pt-BR')}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Tabela */}

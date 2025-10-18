@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { apiService } from "../services/api";
 import "./CadastroUsuario.css"; // Importa o CSS puro
 
 const Register = () => {
@@ -10,13 +11,121 @@ const Register = () => {
         password: "",
     });
 
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ type: "", text: "" });
+
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        let { name, value } = e.target;
+
+        // Aplicar máscaras de formatação
+        if (name === "cpf") {
+            // Máscara do CPF: 000.000.000-00
+            value = value
+                .replace(/\D/g, "") // Remove tudo que não é dígito
+                .replace(/(\d{3})(\d)/, "$1.$2") // Coloca um ponto entre o terceiro e quarto dígitos
+                .replace(/(\d{3})(\d)/, "$1.$2") // Coloca um ponto entre o terceiro e quarto dígitos
+                .replace(/(\d{3})(\d{1,2})$/, "$1-$2"); // Coloca um hífen entre o terceiro e quarto dígitos
+        } else if (name === "phone") {
+            // Máscara do telefone: (00) 00000-0000
+            value = value
+                .replace(/\D/g, "") // Remove tudo que não é dígito
+                .replace(/(\d{2})(\d)/, "($1) $2") // Coloca parênteses em volta dos dois primeiros dígitos
+                .replace(/(\d{4,5})(\d{4})$/, "$1-$2"); // Coloca um hífen entre o quarto e quinto dígitos
+        }
+
+        setFormData({ ...formData, [name]: value });
+        
+        // Limpa mensagens ao digitar
+        if (message.text) {
+            setMessage({ type: "", text: "" });
+        }
     };
 
-    const handleSubmit = (e) => {
+    // Função para validar CPF
+    const validateCPF = (cpf) => {
+        const cleanCPF = cpf.replace(/\D/g, "");
+        return cleanCPF.length === 11;
+    };
+
+    // Função para validar telefone
+    const validatePhone = (phone) => {
+        const cleanPhone = phone.replace(/\D/g, "");
+        return cleanPhone.length >= 10;
+    };
+
+    // Função para chamar a API de cadastro
+    const registerUser = async (userData) => {
+        try {
+            const result = await apiService.usuarios.cadastrar(userData);
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form enviado:", formData);
+        setLoading(true);
+        setMessage({ type: "", text: "" });
+
+        try {
+            // Validações do formulário
+            if (!validateCPF(formData.cpf)) {
+                throw new Error("CPF deve ter 11 dígitos");
+            }
+
+            if (!validatePhone(formData.phone)) {
+                throw new Error("Telefone deve ter pelo menos 10 dígitos");
+            }
+
+            if (formData.password.length < 6) {
+                throw new Error("Senha deve ter pelo menos 6 caracteres");
+            }
+
+            // Chama a API
+            const result = await registerUser(formData);
+
+            // Sucesso
+            setMessage({
+                type: "success",
+                text: "Usuário cadastrado com sucesso! Redirecionando para o login..."
+            });
+
+            // Limpa o formulário
+            setFormData({
+                name: "",
+                email: "",
+                phone: "",
+                cpf: "",
+                password: "",
+            });
+
+            // Redireciona após 2 segundos
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 2000);
+
+        } catch (error) {
+            console.error("Erro no cadastro:", error);
+            
+            // Trata diferentes tipos de erro
+            let errorMessage = "Erro ao cadastrar usuário. Tente novamente.";
+            
+            if (error.message) {
+                // Se o erro tem uma mensagem específica do backend, usa ela
+                errorMessage = error.message;
+            } else if (error.name === "TypeError") {
+                // Erro de rede/conexão
+                errorMessage = "Erro de conexão. Verifique se o servidor está rodando.";
+            }
+            
+            setMessage({
+                type: "error",
+                text: errorMessage
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -49,6 +158,18 @@ const Register = () => {
                         <h1>Crie sua conta</h1>
                         <p>Junte se a nós e crie agendamentos de forma fácil.</p>
                     </div>
+
+                    {/* Mensagem de feedback */}
+                    {message.text && (
+                        <div className={`message-alert ${message.type === "success" ? "success" : "error"}`}>
+                            <div className="message-content">
+                                <span className="message-icon">
+                                    {message.type === "success" ? "✅" : "❌"}
+                                </span>
+                                <span className="message-text">{message.text}</span>
+                            </div>
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
@@ -83,10 +204,11 @@ const Register = () => {
                                 id="phone"
                                 name="phone"
                                 type="tel"
-                                placeholder="Coloque seu número de celular"
+                                placeholder="(00) 00000-0000"
                                 required
                                 value={formData.phone}
                                 onChange={handleChange}
+                                maxLength="15"
                             />
                         </div>
 
@@ -96,10 +218,11 @@ const Register = () => {
                                 id="cpf"
                                 name="cpf"
                                 type="text"
-                                placeholder="Coloque seu CPF"
+                                placeholder="000.000.000-00"
                                 required
                                 value={formData.cpf}
                                 onChange={handleChange}
+                                maxLength="14"
                             />
                         </div>
 
@@ -116,8 +239,19 @@ const Register = () => {
                             />
                         </div>
 
-                        <button type="submit" className="btn-primary">
-                            Cadastrar
+                        <button 
+                            type="submit" 
+                            className="btn-primary"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <span className="loading-content">
+                                    <span className="spinner"></span>
+                                    Cadastrando...
+                                </span>
+                            ) : (
+                                "Cadastrar"
+                            )}
                         </button>
                     </form>
 

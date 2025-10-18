@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { ROUTES } from "../constants/routes";
 import "./LayoutPrincipal.css";
 
 export default function LayoutPrincipal({ children, paginaAtiva = "dashboard" }) {
@@ -21,11 +22,11 @@ export default function LayoutPrincipal({ children, paginaAtiva = "dashboard" })
   }, []);
 
   const navegacao = [
-    { key: "dashboard", label: "Dashboard", icon: "dashboard", href: "#" },
-    { key: "servicos", label: "Serviços", icon: "content_cut", href: "/gerenciamento-servicos" },
-    { key: "clientes", label: "Clientes", icon: "group", href: "/gerenciamento-clientes" },
-    { key: "agendamentos", label: "Agendamentos", icon: "calendar_month", href: "/gerenciamento-agendamentos" },
-    { key: "profissionais", label: "Profissionais", icon: "person", href: "/gerenciamento-profissionais" },
+    { key: "dashboard", label: "Dashboard", icon: "dashboard", href: ROUTES.DASHBOARD },
+    { key: "servicos", label: "Serviços", icon: "content_cut", href: ROUTES.GERENCIAMENTO_SERVICOS },
+    { key: "clientes", label: "Clientes", icon: "group", href: ROUTES.GERENCIAMENTO_CLIENTES },
+    { key: "agendamentos", label: "Agendamentos", icon: "calendar_month", href: ROUTES.GERENCIAMENTO_AGENDAMENTOS },
+    { key: "profissionais", label: "Profissionais", icon: "person", href: ROUTES.GERENCIAMENTO_PROFISSIONAIS },
   ];
 
   return (

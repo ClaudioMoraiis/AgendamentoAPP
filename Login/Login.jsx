@@ -1,21 +1,25 @@
 import React, { useState } from "react";
 import "./Login.css"; // Importa o CSS puro
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useAppNavigation } from "../hooks/useAppNavigation";
+import { ROUTES } from "../constants/routes";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const navigate = useNavigate();
+  const { navigateTo } = useAppNavigation();
   const handleSubmit = (e) => {
     e.preventDefault();
     // Lógica fictícia de autenticação
     if (email === "admin@admin.com" && password === "admin") {
       localStorage.setItem("role", "admin");
-      navigate("/gerenciamento-servicos");
+      localStorage.setItem("token", "admin-token-123");
+      navigateTo.dashboard(); // Redireciona para o dashboard administrativo
     } else {
       localStorage.setItem("role", "cliente");
-      navigate("/agendamento");
+      localStorage.setItem("token", "client-token-456");
+      navigateTo.servicos(); // Leva para página de serviços onde o cliente pode escolher o que agendar
     }
   };
 
