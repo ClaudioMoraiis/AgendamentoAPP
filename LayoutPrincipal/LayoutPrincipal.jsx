@@ -1,12 +1,25 @@
 import React, { useState } from "react";
 import { ROUTES } from "../constants/routes";
+import { useAppNavigation } from "../hooks/useAppNavigation";
 import "./LayoutPrincipal.css";
 
 export default function LayoutPrincipal({ children, paginaAtiva = "dashboard" }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
+  const { navigateTo } = useAppNavigation();
 
   const closeMenu = () => setMenuOpen(false);
+
+  const handleLogout = () => {
+    // Limpa os dados do localStorage
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("role");
+    localStorage.removeItem("token");
+    
+    // Usa replace para não permitir voltar com as setas do navegador
+    window.location.replace(ROUTES.LOGIN);
+  };
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -77,6 +90,26 @@ export default function LayoutPrincipal({ children, paginaAtiva = "dashboard" })
                 {item.label}
               </a>
             ))}
+            
+            {/* Botão de Logout */}
+            <button
+              className="layout-nav-link logout-btn"
+              onClick={handleLogout}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'inherit',
+                fontSize: 'inherit',
+                cursor: 'pointer',
+                width: '100%',
+                textAlign: 'left',
+                marginTop: 'auto',
+                padding: '12px 16px'
+              }}
+            >
+              <span className="material-symbols-outlined">logout</span>
+              Sair
+            </button>
           </nav>
         </div>
       </aside>

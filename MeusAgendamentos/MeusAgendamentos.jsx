@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import PageLayout from "../components/PageLayout/PageLayout";
+import { ROUTES } from "../constants/routes";
 import "./MeusAgendamentos.css";
 
 const dadosFicticios = [
@@ -43,8 +44,14 @@ const MeusAgendamentos = () => {
   });
 
   const handleLogout = () => {
-    // TODO: Implementar logout e redirecionamento
-    console.log('Logout realizado');
+    // Limpa os dados do localStorage
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("role");
+    localStorage.removeItem("token");
+    
+    // Usa replace para não permitir voltar com as setas do navegador
+    window.location.replace(ROUTES.LOGIN);
   };
 
   return (

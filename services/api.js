@@ -1,8 +1,8 @@
 // Configuração base da API
 const API_BASE_URL = "http://localhost:8080";
 
-// Função auxiliar para fazer requisições
-const makeRequest = async (endpoint, options = {}) => {
+// Função para requisições que não precisam de autenticação (login, cadastro)
+const makePublicRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
   
   const defaultOptions = {
@@ -12,11 +12,67 @@ const makeRequest = async (endpoint, options = {}) => {
     },
   };
 
-  // Adiciona token de autorização se existir
-  const token = localStorage.getItem("authToken");
-  if (token) {
-    defaultOptions.headers.Authorization = `Bearer ${token}`;
+  const config = {
+    ...defaultOptions,
+    ...options,
+    headers: {
+      ...defaultOptions.headers,
+      ...options.headers,
+    },
+  };
+
+  try {
+    const response = await fetch(url, config);
+    
+    // Verifica o Content-Type da resposta
+    const contentType = response.headers.get("content-type");
+    let data;
+
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
+
+    if (!response.ok) {
+      // Tenta extrair mensagem de erro
+      let errorMessage = `Erro HTTP: ${response.status}`;
+      
+      if (typeof data === 'object' && data.message) {
+        errorMessage += ` - ${data.message}`;
+      } else if (typeof data === 'string') {
+        errorMessage += ` - ${data}`;
+      }
+      
+      console.log('📝 Mensagem de erro processada:', errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Erro na requisição para', endpoint + ':', error);
+    throw error;
   }
+};
+
+// Função para requisições que precisam de autenticação (todas as outras)
+const makeAuthenticatedRequest = async (endpoint, options = {}) => {
+  const url = `${API_BASE_URL}${endpoint}`;
+  
+  const defaultOptions = {
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  };
+
+  // Sempre adiciona o token JWT para requisições autenticadas
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+  }
+  
+  defaultOptions.headers.Authorization = `Bearer ${token}`;
 
   const config = {
     ...defaultOptions,
@@ -98,7 +154,7 @@ const makeRequest = async (endpoint, options = {}) => {
 export const apiService = {
   // Usuários
   usuarios: {
-    // Cadastro de usuário
+    // Cadastro de usuário (público - não precisa de token)
     cadastrar: (userData) => {
       const payload = {
         nome: userData.name,
@@ -108,42 +164,43 @@ export const apiService = {
         senha: userData.password
       };
       
-      return makeRequest("/usuario/cadastrar", {
+      return makePublicRequest("/usuario/cadastrar", {
         method: "POST",
         body: JSON.stringify(payload),
       });
     },
 
-    // Login
-    login: (credentials) =>
-      makeRequest("/usuario/login", {
-        method: "POST",
-        body: JSON.stringify({
-          email: credentials.email,
-          senha: credentials.password,
-        }),
-      }),
+    // Login (público - não precisa de token)
+    login: (credentials) => {
+      const params = new URLSearchParams({
+        email: credentials.email,
+        senha: credentials.senha
+      });
+      return makePublicRequest(`/usuario/login?${params.toString()}`, {
+        method: "POST"
+      });
+    },
 
-    // Alterar senha
+    // Alterar senha (requer token)
     alterarSenha: (senhaData) =>
-      makeRequest("/usuario/alterar-senha", {
+      makeAuthenticatedRequest("/usuario/alterar-senha", {
         method: "PUT",
         body: JSON.stringify(senhaData),
       }),
 
-    // Recuperar senha
+    // Recuperar senha (público - não precisa de token)
     recuperarSenha: (email) =>
-      makeRequest("/usuario/recuperar-senha", {
+      makePublicRequest("/usuario/recuperar-senha", {
         method: "POST",
         body: JSON.stringify({ email }),
       }),
 
-    // Listar todos os usuários (admin)
-    listar: () => makeRequest("/usuario"),
+    // Listar todos os usuários (admin - requer token)
+    listar: () => makeAuthenticatedRequest("/usuario"),
 
     // Deletar usuário (admin)
     deletar: (id) =>
-      makeRequest(`/usuario/${id}`, {
+      makeAuthenticatedRequest(`/usuario/${id}`, {
         method: "DELETE",
       }),
   },
@@ -152,36 +209,36 @@ export const apiService = {
   agendamentos: {
     // Criar agendamento
     criar: (agendamentoData) =>
-      makeRequest("/agendamentos", {
+      makeAuthenticatedRequest("/agendamentos", {
         method: "POST",
         body: JSON.stringify(agendamentoData),
       }),
 
     // Listar agendamentos do usuário
-    meus: () => makeRequest("/agendamentos/meus"),
+    meus: () => makeAuthenticatedRequest("/agendamentos/meus"),
 
     // Listar todos os agendamentos (admin)
-    listar: () => makeRequest("/agendamentos"),
+    listar: () => makeAuthenticatedRequest("/agendamentos"),
 
     // Buscar agendamento por ID
-    buscarPorId: (id) => makeRequest(`/agendamentos/${id}`),
+    buscarPorId: (id) => makeAuthenticatedRequest(`/agendamentos/${id}`),
 
     // Atualizar agendamento
     atualizar: (id, agendamentoData) =>
-      makeRequest(`/agendamentos/${id}`, {
+      makeAuthenticatedRequest(`/agendamentos/${id}`, {
         method: "PUT",
         body: JSON.stringify(agendamentoData),
       }),
 
     // Cancelar agendamento
     cancelar: (id) =>
-      makeRequest(`/agendamentos/${id}/cancelar`, {
+      makeAuthenticatedRequest(`/agendamentos/${id}/cancelar`, {
         method: "PUT",
       }),
 
     // Deletar agendamento (admin)
     deletar: (id) =>
-      makeRequest(`/agendamentos/${id}`, {
+      makeAuthenticatedRequest(`/agendamentos/${id}`, {
         method: "DELETE",
       }),
   },
@@ -189,25 +246,25 @@ export const apiService = {
   // Serviços
   servicos: {
     // Listar serviços
-    listar: () => makeRequest("/servicos"),
+    listar: () => makeAuthenticatedRequest("/servicos"),
 
     // Criar serviço (admin)
     criar: (servicoData) =>
-      makeRequest("/servicos", {
+      makeAuthenticatedRequest("/servicos", {
         method: "POST",
         body: JSON.stringify(servicoData),
       }),
 
     // Atualizar serviço (admin)
     atualizar: (id, servicoData) =>
-      makeRequest(`/servicos/${id}`, {
+      makeAuthenticatedRequest(`/servicos/${id}`, {
         method: "PUT",
         body: JSON.stringify(servicoData),
       }),
 
     // Deletar serviço (admin)
     deletar: (id) =>
-      makeRequest(`/servicos/${id}`, {
+      makeAuthenticatedRequest(`/servicos/${id}`, {
         method: "DELETE",
       }),
   },
@@ -215,25 +272,25 @@ export const apiService = {
   // Profissionais
   profissionais: {
     // Listar profissionais
-    listar: () => makeRequest("/profissionais"),
+    listar: () => makeAuthenticatedRequest("/profissionais"),
 
     // Criar profissional (admin)
     criar: (profissionalData) =>
-      makeRequest("/profissionais", {
+      makeAuthenticatedRequest("/profissionais", {
         method: "POST",
         body: JSON.stringify(profissionalData),
       }),
 
     // Atualizar profissional (admin)
     atualizar: (id, profissionalData) =>
-      makeRequest(`/profissionais/${id}`, {
+      makeAuthenticatedRequest(`/profissionais/${id}`, {
         method: "PUT",
         body: JSON.stringify(profissionalData),
       }),
 
     // Deletar profissional (admin)
     deletar: (id) =>
-      makeRequest(`/profissionais/${id}`, {
+      makeAuthenticatedRequest(`/profissionais/${id}`, {
         method: "DELETE",
       }),
   },
@@ -241,18 +298,18 @@ export const apiService = {
   // Dashboard/Estatísticas (admin)
   dashboard: {
     // Estatísticas gerais
-    estatisticas: () => makeRequest("/dashboard/estatisticas"),
+    estatisticas: () => makeAuthenticatedRequest("/dashboard/estatisticas"),
 
     // Agendamentos por período
     agendamentosPorPeriodo: (periodo) =>
-      makeRequest(`/dashboard/agendamentos-periodo?periodo=${periodo}`),
+      makeAuthenticatedRequest(`/dashboard/agendamentos-periodo?periodo=${periodo}`),
 
     // Serviços mais populares
-    servicosPopulares: () => makeRequest("/dashboard/servicos-populares"),
+    servicosPopulares: () => makeAuthenticatedRequest("/dashboard/servicos-populares"),
 
     // Receita por período
     receita: (periodo) =>
-      makeRequest(`/dashboard/receita?periodo=${periodo}`),
+      makeAuthenticatedRequest(`/dashboard/receita?periodo=${periodo}`),
   },
 };
 
