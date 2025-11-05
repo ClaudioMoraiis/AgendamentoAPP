@@ -598,3 +598,29 @@
     flex: 1;
   }
 }
+
+/* Estilos da notificação toast */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification-toast {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.notification-toast.success {
+  background-color: #10b981 !important;
+  border-color: #059669 !important;
+}
+
+.notification-toast.error {
+  background-color: #ef4444 !important;
+  border-color: #dc2626 !important;
+}

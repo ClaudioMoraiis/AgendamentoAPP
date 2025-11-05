@@ -63,7 +63,7 @@ const Login = () => {
       }
       
       // Verifica se é o email administrativo específico
-      if (email === "adm@gmail.com") {
+      if (email.toUpperCase() === "ADM@GMAIL.COM") {
         console.log('👑 Usuário administrativo detectado, redirecionando para dashboard');
         localStorage.setItem("role", "admin");
         navigateTo.dashboard(); // Redireciona para o dashboard administrativo
@@ -80,16 +80,27 @@ const Login = () => {
       let errorMessage = "Erro ao fazer login. Verifique suas credenciais.";
       
       if (error.message) {
-        // Remove prefixos como "Erro HTTP: 400 - " ou "BadCredentialsException - "
+        // Remove prefixos como "Erro HTTP: 401 - " ou "Erro HTTP: 401" 
         errorMessage = error.message
-          .replace(/^Erro HTTP: \d+ - /, '') // Remove "Erro HTTP: 400 - "
-          .replace(/^.*Exception - /, '') // Remove "BadCredentialsException - "
-          .replace(/^Erro: .*Exception - /, ''); // Remove "Erro: BadCredentialsException - "
+          .replace(/^Erro HTTP:\s*\d+\s*-?\s*/, '') // Remove "Erro HTTP: 401 - " ou "Erro HTTP: 401"
+          .replace(/^.*Exception\s*-\s*/, '') // Remove "BadCredentialsException - "
+          .replace(/^Erro:\s*.*Exception\s*-\s*/, '') // Remove "Erro: BadCredentialsException - "
+          .trim();
+        
+        // Se sobrou só números ou string vazia, usa mensagem padrão
+        if (!errorMessage || /^\d+$/.test(errorMessage)) {
+          errorMessage = "Credenciais inválidas. Verifique seu email e senha.";
+        }
       } else if (typeof error === 'string') {
         errorMessage = error
-          .replace(/^Erro HTTP: \d+ - /, '')
-          .replace(/^.*Exception - /, '')
-          .replace(/^Erro: .*Exception - /, '');
+          .replace(/^Erro HTTP:\s*\d+\s*-?\s*/, '')
+          .replace(/^.*Exception\s*-\s*/, '')
+          .replace(/^Erro:\s*.*Exception\s*-\s*/, '')
+          .trim();
+          
+        if (!errorMessage || /^\d+$/.test(errorMessage)) {
+          errorMessage = "Credenciais inválidas. Verifique seu email e senha.";
+        }
       }
       
       setError(errorMessage);

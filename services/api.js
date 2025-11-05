@@ -246,7 +246,7 @@ export const apiService = {
   // Serviços
   servicos: {
     // Listar serviços
-    listar: () => makeAuthenticatedRequest("/servicos"),
+    listar: () => makeAuthenticatedRequest("/servico/listar"),
 
     // Criar serviço (admin)
     criar: (servicoData) =>
@@ -257,14 +257,14 @@ export const apiService = {
 
     // Atualizar serviço (admin)
     atualizar: (id, servicoData) =>
-      makeAuthenticatedRequest(`/servicos/${id}`, {
+      makeAuthenticatedRequest(`/servico/${id}`, {
         method: "PUT",
         body: JSON.stringify(servicoData),
       }),
 
     // Deletar serviço (admin)
     deletar: (id) =>
-      makeAuthenticatedRequest(`/servicos/${id}`, {
+      makeAuthenticatedRequest(`/servico/${id}`, {
         method: "DELETE",
       }),
   },
