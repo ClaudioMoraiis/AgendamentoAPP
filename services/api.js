@@ -189,10 +189,24 @@ export const apiService = {
       }),
 
     // Recuperar senha (público - não precisa de token)
-    recuperarSenha: (email) =>
-      makePublicRequest("/usuario/recuperar-senha", {
-        method: "POST",
-        body: JSON.stringify({ email }),
+    recuperarSenha: (email) => {
+      const params = new URLSearchParams({
+        email: email
+      });
+      return makePublicRequest(`/usuario/recuperar-senha?${params.toString()}`, {
+        method: "POST"
+      });
+    },
+
+    // Redefinir senha com token (público - não precisa de token de autenticação)
+    redefinirSenha: (token, novaSenha, confirmarSenha) =>
+      makePublicRequest("/usuario/redefinir-senha", {
+        method: "PUT",
+        body: JSON.stringify({ 
+          token: token,
+          senha: novaSenha,
+          confirmarSenha: confirmarSenha
+        }),
       }),
 
     // Listar todos os usuários (admin - requer token)
@@ -250,7 +264,7 @@ export const apiService = {
 
     // Criar serviço (admin)
     criar: (servicoData) =>
-      makeAuthenticatedRequest("/servicos", {
+      makeAuthenticatedRequest("/servico/cadastrar", {
         method: "POST",
         body: JSON.stringify(servicoData),
       }),

@@ -71,11 +71,12 @@ export default function GerenciamentoServicos() {
     
     try {
       const servicoData = {
-        nome: novoServico.nome.toUpperCase(),
-        duracao: novoServico.duracao.toUpperCase(),
-        valor: parseFloat(novoServico.valor)
+        nome: novoServico.nome,
+        duracao: novoServico.duracao,
+        preco: parseFloat(novoServico.valor)
       };
       
+      console.log('➕ Criando serviço:', servicoData);
       await apiService.servicos.criar(servicoData);
       showNotification('Serviço criado com sucesso!', 'success');
       await carregarServicos(); // Recarrega a lista
