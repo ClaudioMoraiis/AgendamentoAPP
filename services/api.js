@@ -38,8 +38,15 @@ const makePublicRequest = async (endpoint, options = {}) => {
       // Tenta extrair mensagem de erro
       let errorMessage = `Erro HTTP: ${response.status}`;
       
-      if (typeof data === 'object' && data.message) {
-        errorMessage += ` - ${data.message}`;
+      if (typeof data === 'object') {
+        // Verifica se tem campo "Erro" (formato do backend)
+        if (data.Erro) {
+          errorMessage = data.Erro;
+        } else if (data.message) {
+          errorMessage += ` - ${data.message}`;
+        } else {
+          errorMessage += ` - ${JSON.stringify(data)}`;
+        }
       } else if (typeof data === 'string') {
         errorMessage += ` - ${data}`;
       }
@@ -72,6 +79,7 @@ const makeAuthenticatedRequest = async (endpoint, options = {}) => {
     throw new Error("Token de autenticação não encontrado. Faça login novamente.");
   }
   
+  console.log('🔑 Token sendo enviado:', token.substring(0, 20) + '...');
   defaultOptions.headers.Authorization = `Bearer ${token}`;
 
   const config = {
@@ -210,13 +218,29 @@ export const apiService = {
       }),
 
     // Listar todos os usuários (admin - requer token)
-    listar: () => makeAuthenticatedRequest("/usuario"),
+    listar: () => makeAuthenticatedRequest("/usuario/listar"),
+
+    // Alterar usuário (admin - requer token)
+    alterar: (id, userData) => {
+      console.log('🔄 API alterar - ID:', id, 'Dados:', userData);
+      return makeAuthenticatedRequest(`/usuario/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          nome: userData.nome,
+          email: userData.email,
+          celular: userData.telefone, // Componente usa 'telefone', API usa 'celular'
+          cpf: userData.cpf
+        }),
+      });
+    },
 
     // Deletar usuário (admin)
-    deletar: (id) =>
-      makeAuthenticatedRequest(`/usuario/${id}`, {
+    deletar: (id) => {
+      console.log('🗑️ API deletar - ID:', id);
+      return makeAuthenticatedRequest(`/usuario/${id}`, {
         method: "DELETE",
-      }),
+      });
+    },
   },
 
   // Agendamentos

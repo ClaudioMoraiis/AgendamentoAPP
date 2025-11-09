@@ -1,28 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./GerenciamentoClientes.css";
 import LayoutPrincipal from "../LayoutPrincipal/LayoutPrincipal";
+import { apiService } from "../services/api";
 
-const clientesIniciais = [
-  { nome: "Carlos Silva", email: "carlos.silva@email.com", telefone: "(11) 98765-4321", cpf: "123.456.789-00" },
-  { nome: "Ana Souza", email: "ana.souza@email.com", telefone: "(21) 91234-5678", cpf: "987.654.321-00" },
-  { nome: "Ricardo Almeida", email: "ricardo.almeida@email.com", telefone: "(31) 99876-5432", cpf: "456.789.012-34" },
-  { nome: "Fernanda Costa", email: "fernanda.costa@email.com", telefone: "(41) 91234-5678", cpf: "789.012.345-67" },
-  { nome: "Lucas Pereira", email: "lucas.pereira@email.com", telefone: "(51) 98765-4321", cpf: "012.345.678-90" },
-  { nome: "Mariana Oliveira", email: "mariana.oliveira@email.com", telefone: "(61) 91234-5678", cpf: "345.678.901-23" },
-];
+
 
 export default function GerenciamentoClientes() {
-  const [clientes, setClientes] = useState(clientesIniciais);
+  const [clientes, setClientes] = useState([]);
   const [busca, setBusca] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalEditarOpen, setModalEditarOpen] = useState(false);
   const [clienteEditando, setClienteEditando] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [loadingClientes, setLoadingClientes] = useState(true);
+  const [message, setMessage] = useState({ text: "", type: "" });
   const [novoCliente, setNovoCliente] = useState({
     nome: "",
     email: "",
     telefone: "",
     cpf: ""
   });
+
+  // Carrega clientes da API ao iniciar o componente
+  useEffect(() => {
+    carregarClientes();
+  }, []);
+
+  // Função para carregar clientes da API
+  const carregarClientes = async () => {
+    try {
+      setLoadingClientes(true);
+      const response = await apiService.usuarios.listar();
+      
+      // Mapeia os dados da API para o formato do componente
+      const clientesFormatados = response.map(cliente => ({
+        id: cliente.id,
+        nome: cliente.nome,
+        email: cliente.email,
+        telefone: cliente.celular, // API usa 'celular', componente usa 'telefone'
+        cpf: cliente.cpf
+      }));
+      
+      console.log('👥 Clientes carregados com IDs:', clientesFormatados.map(c => ({ nome: c.nome, id: c.id })));
+      setClientes(clientesFormatados);
+    } catch (error) {
+      console.error('❌ Erro ao carregar clientes:', error);
+      setMessage({ 
+        text: 'Erro ao carregar clientes. Tente novamente.', 
+        type: "error" 
+      });
+      // Se der erro, usa uma lista vazia
+      setClientes([]);
+    } finally {
+      setLoadingClientes(false);
+    }
+  };
 
   // Funções auxiliares para modais e ações
   const abrirModalNovo = () => {
@@ -35,7 +67,11 @@ export default function GerenciamentoClientes() {
   };
 
   const abrirModalEditar = (cliente, index) => {
-    setClienteEditando({ ...cliente, index });
+    setClienteEditando({ 
+      ...cliente, 
+      index,
+      id: cliente.id // Garante que o ID seja incluído
+    });
     setModalEditarOpen(true);
   };
 
@@ -44,41 +80,173 @@ export default function GerenciamentoClientes() {
     setClienteEditando(null);
   };
 
-  const salvarNovoCliente = (e) => {
-    e.preventDefault();
-    if (!novoCliente.nome || !novoCliente.email || !novoCliente.telefone || !novoCliente.cpf) {
-      alert("Preencha todos os campos obrigatórios!");
-      return;
-    }
-    setClientes([...clientes, novoCliente]);
-    fecharModalNovo();
+  // Função para gerar senha com os 4 primeiros dígitos do CPF
+  const gerarSenhaCPF = (cpf) => {
+    // Remove tudo que não é número
+    const numerosApenas = cpf.replace(/\D/g, "");
+    // Retorna os 4 primeiros dígitos
+    return numerosApenas.substring(0, 4);
   };
 
-  const salvarEdicaoCliente = (e) => {
+  const salvarNovoCliente = async (e) => {
     e.preventDefault();
-    if (!clienteEditando.nome || !clienteEditando.email || !clienteEditando.telefone || !clienteEditando.cpf) {
-      alert("Preencha todos os campos obrigatórios!");
+    
+    if (!novoCliente.nome || !novoCliente.email || !novoCliente.telefone || !novoCliente.cpf) {
+      setMessage({ text: "Preencha todos os campos obrigatórios!", type: "error" });
       return;
     }
-    const novosClientes = clientes.map((c, i) => 
-      i === clienteEditando.index ? {
+
+    setLoading(true);
+    setMessage({ text: "", type: "" });
+
+    try {
+      // Gera a senha com os 4 primeiros dígitos do CPF
+      const senha = gerarSenhaCPF(novoCliente.cpf);
+      
+      // Prepara os dados no formato da API de cadastro
+      const dadosCadastro = {
+        name: novoCliente.nome,
+        email: novoCliente.email,
+        phone: novoCliente.telefone,
+        cpf: novoCliente.cpf,
+        password: senha
+      };
+
+      // Chama a API de cadastro
+      const response = await apiService.usuarios.cadastrar(dadosCadastro);
+      
+      // Verifica se a resposta contém erro (mesmo com status 200)
+      if (response && typeof response === 'object' && response.Erro) {
+        setMessage({ 
+          text: response.Erro, 
+          type: "error" 
+        });
+        return;
+      }
+      
+      // Verifica se há uma mensagem de sucesso na resposta
+      let successMessage = `Cliente cadastrado com sucesso! Senha gerada: ${senha}`;
+      if (response && typeof response === 'object' && response.Sucesso) {
+        successMessage = `${response.Sucesso} Senha gerada: ${senha}`;
+      }
+      
+      // Se chegou até aqui, o cadastro foi bem-sucedido
+      setMessage({ 
+        text: successMessage, 
+        type: "success" 
+      });
+      
+      // Recarrega a lista de clientes da API
+      await carregarClientes();
+      
+      // Limpa o formulário após 2 segundos
+      setTimeout(() => {
+        fecharModalNovo();
+        setMessage({ text: "", type: "" });
+      }, 2000);
+      
+    } catch (error) {
+      console.error('❌ Erro ao cadastrar cliente:', error);
+      
+      // A mensagem de erro já foi tratada no api.js
+      const errorMessage = error.message || 'Erro ao cadastrar cliente. Tente novamente.';
+      setMessage({ text: errorMessage, type: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const salvarEdicaoCliente = async (e) => {
+    e.preventDefault();
+    
+    if (!clienteEditando.nome || !clienteEditando.email || !clienteEditando.telefone || !clienteEditando.cpf) {
+      setMessage({ text: "Preencha todos os campos obrigatórios!", type: "error" });
+      return;
+    }
+
+    setLoading(true);
+    setMessage({ text: "", type: "" });
+
+    try {
+      console.log('✏️ Editando cliente ID:', clienteEditando.id, 'Dados:', clienteEditando);
+      
+      // Chama a API de alterar usuário
+      const response = await apiService.usuarios.alterar(clienteEditando.id, {
         nome: clienteEditando.nome,
         email: clienteEditando.email,
         telefone: clienteEditando.telefone,
         cpf: clienteEditando.cpf
-      } : c
-    );
-    setClientes(novosClientes);
-    fecharModalEditar();
+      });
+      
+      // Verifica se há mensagem de sucesso na resposta
+      let successMessage = 'Cliente alterado com sucesso!';
+      if (response && typeof response === 'object' && response.Sucesso) {
+        successMessage = response.Sucesso;
+      }
+      
+      setMessage({ 
+        text: successMessage, 
+        type: "success" 
+      });
+      
+      // Recarrega a lista de clientes da API
+      await carregarClientes();
+      
+      // Fecha o modal após 2 segundos
+      setTimeout(() => {
+        fecharModalEditar();
+        setMessage({ text: "", type: "" });
+      }, 2000);
+      
+    } catch (error) {
+      console.error('❌ Erro ao alterar cliente:', error);
+      const errorMessage = error.message || 'Erro ao alterar cliente. Tente novamente.';
+      setMessage({ text: errorMessage, type: "error" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const visualizarCliente = (cliente) => {
     alert(`📋 Cliente: ${cliente.nome}\n📧 Email: ${cliente.email}\n📞 Telefone: ${cliente.telefone}\n🆔 CPF: ${cliente.cpf}`);
   };
 
-  const excluirCliente = (index) => {
-    if (window.confirm("Tem certeza que deseja excluir este cliente?")) {
-      setClientes(clientes.filter((_, i) => i !== index));
+  const excluirCliente = async (cliente, index) => {
+    if (!window.confirm(`Tem certeza que deseja excluir o cliente "${cliente.nome}"?`)) {
+      return;
+    }
+
+    setMessage({ text: "", type: "" });
+
+    try {
+      console.log('🗑️ Excluindo cliente ID:', cliente.id, 'Nome:', cliente.nome);
+      
+      // Chama a API de deletar usuário
+      const response = await apiService.usuarios.deletar(cliente.id);
+      
+      // Verifica se há mensagem de sucesso na resposta
+      let successMessage = 'Cliente excluído com sucesso!';
+      if (response && typeof response === 'object' && response.Sucesso) {
+        successMessage = response.Sucesso;
+      }
+      
+      setMessage({ 
+        text: successMessage, 
+        type: "success" 
+      });
+      
+      // Recarrega a lista de clientes da API
+      await carregarClientes();
+      
+      // Limpa a mensagem após 3 segundos
+      setTimeout(() => {
+        setMessage({ text: "", type: "" });
+      }, 3000);
+      
+    } catch (error) {
+      console.error('❌ Erro ao excluir cliente:', error);
+      const errorMessage = error.message || 'Erro ao excluir cliente. Tente novamente.';
+      setMessage({ text: errorMessage, type: "error" });
     }
   };
 
@@ -103,6 +271,30 @@ export default function GerenciamentoClientes() {
               Novo Cliente
             </button>
           </div>
+
+          {/* Mensagem global de feedback */}
+          {message.text && !modalOpen && (
+            <div 
+              className={`gc-message-global ${message.type}`}
+              style={{
+                padding: '12px 16px',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                backgroundColor: message.type === 'success' ? '#dcfce7' : '#fee2e2',
+                border: `1px solid ${message.type === 'success' ? '#86efac' : '#fecaca'}`,
+                color: message.type === 'success' ? '#166534' : '#dc2626',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <span className="material-symbols-outlined">
+                {message.type === 'success' ? 'check_circle' : 'error'}
+              </span>
+              {message.text}
+            </div>
+          )}
 
           {/* Barra de Busca */}
           <div className="gc-search-container">
@@ -131,9 +323,16 @@ export default function GerenciamentoClientes() {
                 </tr>
               </thead>
               <tbody>
-                {clientesFiltrados.length > 0 ? (
+                {loadingClientes ? (
+                  <tr>
+                    <td colSpan="5" className="gc-empty-state">
+                      <span className="material-symbols-outlined">hourglass_empty</span>
+                      <p>Carregando clientes...</p>
+                    </td>
+                  </tr>
+                ) : clientesFiltrados.length > 0 ? (
                   clientesFiltrados.map((cliente, index) => (
-                    <tr key={index}>
+                    <tr key={cliente.id || index}>
                       <td className="gc-cell-name">{cliente.nome}</td>
                       <td className="gc-hide-lg">{cliente.email}</td>
                       <td className="gc-hide-md">{cliente.telefone}</td>
@@ -156,7 +355,7 @@ export default function GerenciamentoClientes() {
                           </button>
                           <button 
                             className="gc-btn-action gc-btn-delete"
-                            onClick={() => excluirCliente(index)}
+                            onClick={() => excluirCliente(cliente, index)}
                             title="Excluir"
                           >
                             <span className="material-symbols-outlined">delete</span>
@@ -182,6 +381,25 @@ export default function GerenciamentoClientes() {
             <div className="gc-modal-overlay" onClick={fecharModalNovo}>
               <div className="gc-modal" onClick={e => e.stopPropagation()}>
                 <h3>➕ Novo Cliente</h3>
+                
+                {/* Mensagem de feedback */}
+                {message.text && (
+                  <div 
+                    className={`gc-message ${message.type}`}
+                    style={{
+                      padding: '12px',
+                      borderRadius: '6px',
+                      marginBottom: '20px',
+                      backgroundColor: message.type === 'success' ? '#dcfce7' : '#fee2e2',
+                      border: `1px solid ${message.type === 'success' ? '#86efac' : '#fecaca'}`,
+                      color: message.type === 'success' ? '#166534' : '#dc2626',
+                      fontSize: '14px'
+                    }}
+                  >
+                    {message.text}
+                  </div>
+                )}
+
                 <form onSubmit={salvarNovoCliente}>
                   <div className="gc-form-group">
                     <label>Nome Completo *</label>
@@ -222,14 +440,26 @@ export default function GerenciamentoClientes() {
                       placeholder="000.000.000-00"
                       required
                     />
+                    <small style={{color: '#6b7280', fontSize: '0.8rem', marginTop: '4px'}}>
+                      💡 A senha será gerada automaticamente com os 4 primeiros dígitos do CPF
+                    </small>
                   </div>
                   <div className="gc-modal-buttons">
                     <button type="button" onClick={fecharModalNovo} className="gc-btn-cancel">
                       Cancelar
                     </button>
-                    <button type="submit" className="gc-btn-save">
-                      <span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>save</span>
-                      Salvar Cliente
+                    <button type="submit" className="gc-btn-save" disabled={loading}>
+                      {loading ? (
+                        <>
+                          <span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>hourglass_empty</span>
+                          Cadastrando...
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>save</span>
+                          Salvar Cliente
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>
@@ -242,6 +472,25 @@ export default function GerenciamentoClientes() {
             <div className="gc-modal-overlay" onClick={fecharModalEditar}>
               <div className="gc-modal" onClick={e => e.stopPropagation()}>
                 <h3>✏️ Editar Cliente</h3>
+                
+                {/* Mensagem de feedback */}
+                {message.text && (
+                  <div 
+                    className={`gc-message ${message.type}`}
+                    style={{
+                      padding: '12px',
+                      borderRadius: '6px',
+                      marginBottom: '20px',
+                      backgroundColor: message.type === 'success' ? '#dcfce7' : '#fee2e2',
+                      border: `1px solid ${message.type === 'success' ? '#86efac' : '#fecaca'}`,
+                      color: message.type === 'success' ? '#166534' : '#dc2626',
+                      fontSize: '14px'
+                    }}
+                  >
+                    {message.text}
+                  </div>
+                )}
+
                 <form onSubmit={salvarEdicaoCliente}>
                   <div className="gc-form-group">
                     <label>Nome Completo *</label>
@@ -287,9 +536,18 @@ export default function GerenciamentoClientes() {
                     <button type="button" className="gc-btn-cancel" onClick={fecharModalEditar}>
                       Cancelar
                     </button>
-                    <button type="submit" className="gc-btn-save">
-                      <span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>save</span>
-                      Salvar Alterações
+                    <button type="submit" className="gc-btn-save" disabled={loading}>
+                      {loading ? (
+                        <>
+                          <span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>hourglass_empty</span>
+                          Salvando...
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>save</span>
+                          Salvar Alterações
+                        </>
+                      )}
                     </button>
                   </div>
                 </form>
