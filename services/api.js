@@ -309,28 +309,49 @@ export const apiService = {
 
   // Profissionais
   profissionais: {
-    // Listar profissionais
-    listar: () => makeAuthenticatedRequest("/profissionais"),
+    // Listar profissionais (admin - requer token)
+    listar: () => makeAuthenticatedRequest("/profissional/listar"),
 
-    // Criar profissional (admin)
-    criar: (profissionalData) =>
-      makeAuthenticatedRequest("/profissionais", {
+    // Criar profissional (admin - requer token)
+    // Endpoint solicitado: POST /profissional/cadastrar
+    criar: (profissionalData) => {
+      console.log('🔄 API profissional cadastrar - Dados:', profissionalData);
+      return makeAuthenticatedRequest("/profissional/cadastrar", {
         method: "POST",
-        body: JSON.stringify(profissionalData),
-      }),
+        body: JSON.stringify({
+          nome: profissionalData.nome,
+          telefone: profissionalData.telefone,
+          especialidade: profissionalData.especialidade,
+          email: profissionalData.email,
+          status: profissionalData.status
+        }),
+      });
+    },
 
     // Atualizar profissional (admin)
     atualizar: (id, profissionalData) =>
-      makeAuthenticatedRequest(`/profissionais/${id}`, {
+      makeAuthenticatedRequest(`/profissional/${id}`, {
         method: "PUT",
-        body: JSON.stringify(profissionalData),
+        body: JSON.stringify({
+          nome: profissionalData.nome,
+          telefone: profissionalData.telefone,
+          especialidade: profissionalData.especialidade,
+          email: profissionalData.email,
+          status: profissionalData.status
+        }),
       }),
 
     // Deletar profissional (admin)
     deletar: (id) =>
-      makeAuthenticatedRequest(`/profissionais/${id}`, {
+      makeAuthenticatedRequest(`/profissional/${id}`, {
         method: "DELETE",
       }),
+  },
+
+  // Especialidades
+  especialidades: {
+    // Listar especialidades (admin - requer token)
+    listar: () => makeAuthenticatedRequest("/especialidade/listar"),
   },
 
   // Dashboard/Estatísticas (admin)

@@ -1,26 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./GerenciamentoProfissionais.css";
 import LayoutPrincipal from "../LayoutPrincipal/LayoutPrincipal";
+import { apiService } from "../services/api";
 
-const profissionaisIniciais = [
-  { id: 1, nome: "João Barber", email: "joao.barber@email.com", telefone: "(11) 98765-4321", especialidade: "Corte Masculino", status: "ativo" },
-  { id: 2, nome: "Maria Style", email: "maria.style@email.com", telefone: "(21) 91234-5678", especialidade: "Colorização", status: "ativo" },
-  { id: 3, nome: "Pedro Master", email: "pedro.master@email.com", telefone: "(31) 99876-5432", especialidade: "Barba e Estilo", status: "inativo" },
-  { id: 4, nome: "Ana Cabeleireira", email: "ana.cabelo@email.com", telefone: "(41) 91234-5678", especialidade: "Corte Feminino", status: "ativo" },
-  { id: 5, nome: "Carlos Tesoura", email: "carlos.tesoura@email.com", telefone: "(51) 98765-4321", especialidade: "Corte Social", status: "ativo" },
-];
-
-const especialidades = ["Todos", "Corte Masculino", "Corte Feminino", "Colorização", "Barba e Estilo", "Corte Social"];
+// Status options
 const statusOptions = ["Todos", "ativo", "inativo"];
 
 export default function GerenciamentoProfissionais() {
-  const [profissionais, setProfissionais] = useState(profissionaisIniciais);
+  const [profissionais, setProfissionais] = useState([]);
+  const [especialidades, setEspecialidades] = useState([]); // array of names (strings) or objects
   const [busca, setBusca] = useState("");
   const [especialidadeFiltro, setEspecialidadeFiltro] = useState("Todos");
   const [statusFiltro, setStatusFiltro] = useState("Todos");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalEditarOpen, setModalEditarOpen] = useState(false);
   const [profissionalEditando, setProfissionalEditando] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [loadingProfissionais, setLoadingProfissionais] = useState(true);
+  const [message, setMessage] = useState({ text: "", type: "" });
   const [novoProfissional, setNovoProfissional] = useState({
     nome: "",
     email: "",
@@ -29,13 +26,81 @@ export default function GerenciamentoProfissionais() {
     status: "ativo"
   });
 
+  // Carrega profissionais da API ao montar
+  useEffect(() => {
+    carregarProfissionais();
+    carregarEspecialidades();
+  }, []);
+
+  const carregarProfissionais = async () => {
+    try {
+      setLoadingProfissionais(true);
+      const resp = await apiService.profissionais.listar();
+      // resp expected to be an array of objects with nome, telefone, especialidade, email, status, id
+      const list = Array.isArray(resp) ? resp.map(p => ({
+        id: p.id,
+        nome: p.nome,
+        email: p.email,
+        telefone: p.telefone,
+        // store as-is (likely a string name) but ensure string when it's a primitive
+        especialidade: typeof p.especialidade === 'string' ? p.especialidade : (p.especialidade ? String(p.especialidade) : ''),
+        status: String(p.status)
+      })) : [];
+      console.log('👷 Profissionais carregados:', list.map(x => ({nome: x.nome, id: x.id}))); 
+      setProfissionais(list);
+    } catch (error) {
+      console.error('❌ Erro ao carregar profissionais:', error);
+      setMessage({ text: error.message || 'Erro ao carregar profissionais', type: 'error' });
+      setProfissionais([]);
+    } finally {
+      setLoadingProfissionais(false);
+    }
+  };
+
+  // Carrega especialidades da API (utiliza /especialidade/listar)
+  const carregarEspecialidades = async () => {
+    try {
+      const resp = await apiService.especialidades.listar();
+      // resp may be an array of strings or objects; normalize to array of strings (names)
+      let list = [];
+      if (Array.isArray(resp)) {
+        list = resp.map(item => {
+          if (!item) return '';
+          if (typeof item === 'string') return item;
+          // common field names: nome, descricao, label
+          return item.nome || item.label || item.descricao || item.name || JSON.stringify(item);
+        }).filter(Boolean);
+      }
+      setEspecialidades(list);
+    } catch (error) {
+      console.error('❌ Erro ao carregar especialidades:', error);
+      // keep existing list empty; user can still use free-text if needed
+      setEspecialidades([]);
+    }
+  };
+
   // Filtros combinados
+  // Resolve especialidade for display: if it's already a string, return it; if it's an id, try to lookup in fetched list
+  const getEspecialidadeLabel = (especialidadeValue) => {
+    if (!especialidadeValue && especialidadeValue !== 0) return '';
+    if (typeof especialidadeValue === 'string') return especialidadeValue;
+    // number -> try to find matching record in especialidades (if we have object forms like {id,nome})
+    const found = especialidades.find(e => {
+      if (!e) return false;
+      if (typeof e === 'string') return false;
+      return Number(e.id) === Number(especialidadeValue) || String(e.id) === String(especialidadeValue);
+    });
+    if (found) return found.nome || found.label || JSON.stringify(found);
+    return String(especialidadeValue);
+  };
+
   const profissionaisFiltrados = profissionais.filter(profissional => {
+    const espLabel = getEspecialidadeLabel(profissional.especialidade);
     const buscaMatch =
       profissional.nome.toLowerCase().includes(busca.toLowerCase()) ||
       profissional.email.toLowerCase().includes(busca.toLowerCase()) ||
-      profissional.especialidade.toLowerCase().includes(busca.toLowerCase());
-    const especialidadeMatch = especialidadeFiltro === "Todos" || profissional.especialidade === especialidadeFiltro;
+      espLabel.toLowerCase().includes(busca.toLowerCase());
+    const especialidadeMatch = especialidadeFiltro === "Todos" || espLabel === especialidadeFiltro;
     const statusMatch = statusFiltro === "Todos" || profissional.status === statusFiltro;
     return buscaMatch && especialidadeMatch && statusMatch;
   });
@@ -63,35 +128,112 @@ export default function GerenciamentoProfissionais() {
     setProfissionalEditando(null);
   };
 
-  const salvarNovoProfissional = (e) => {
+  const salvarNovoProfissional = async (e) => {
     e.preventDefault();
     if (!novoProfissional.nome || !novoProfissional.email || !novoProfissional.especialidade) {
-      alert("Preencha todos os campos obrigatórios!");
+      setMessage({ text: "Preencha todos os campos obrigatórios!", type: "error" });
       return;
     }
-    const novoId = Math.max(...profissionais.map(p => p.id), 0) + 1;
-    const profissionalComId = { ...novoProfissional, id: novoId };
-    setProfissionais([...profissionais, profissionalComId]);
-    fecharModalNovo();
+
+    setLoading(true);
+    setMessage({ text: "", type: "" });
+
+    try {
+      // Chama API para cadastrar profissional
+      const payload = {
+        nome: novoProfissional.nome,
+        telefone: novoProfissional.telefone || "",
+        especialidade: novoProfissional.especialidade,
+        email: novoProfissional.email,
+        status: novoProfissional.status || "true"
+      };
+      const response = await apiService.profissionais.criar(payload);
+
+      // Se houver campo Erro, a apiService já lançou; caso retorne Sucesso, exibe
+      let successMessage = 'Profissional cadastrado com sucesso';
+      if (response && typeof response === 'object') {
+        if (response.Sucesso) successMessage = response.Sucesso;
+      }
+
+      setMessage({ text: successMessage, type: 'success' });
+
+      // Recarrega lista
+      await carregarProfissionais();
+
+      // Fecha modal após 1.5s
+      setTimeout(() => {
+        fecharModalNovo();
+        setMessage({ text: "", type: "" });
+      }, 1500);
+    } catch (error) {
+      console.error('❌ Erro ao cadastrar profissional:', error);
+      setMessage({ text: error.message || 'Erro ao cadastrar profissional', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const salvarEdicaoProfissional = (e) => {
+  const salvarEdicaoProfissional = async (e) => {
     e.preventDefault();
     if (!profissionalEditando.nome || !profissionalEditando.email || !profissionalEditando.especialidade) {
-      alert("Preencha todos os campos obrigatórios!");
+      setMessage({ text: "Preencha todos os campos obrigatórios!", type: "error" });
       return;
     }
-    const novosProfissionais = profissionais.map(profissional => 
-      profissional.id === profissionalEditando.id ? profissionalEditando : profissional
-    );
-    setProfissionais(novosProfissionais);
-    fecharModalEditar();
+
+    setLoading(true);
+    setMessage({ text: "", type: "" });
+
+    try {
+      const response = await apiService.profissionais.atualizar(profissionalEditando.id, {
+        nome: profissionalEditando.nome,
+        telefone: profissionalEditando.telefone,
+        especialidade: profissionalEditando.especialidade,
+        email: profissionalEditando.email,
+        status: profissionalEditando.status
+      });
+
+      let successMessage = 'Profissional alterado com sucesso';
+      if (response && typeof response === 'object' && response.Sucesso) {
+        successMessage = response.Sucesso;
+      }
+      setMessage({ text: successMessage, type: 'success' });
+
+      await carregarProfissionais();
+
+      setTimeout(() => {
+        fecharModalEditar();
+        setMessage({ text: "", type: "" });
+      }, 1500);
+    } catch (error) {
+      console.error('❌ Erro ao alterar profissional:', error);
+      setMessage({ text: error.message || 'Erro ao alterar profissional', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const excluirProfissional = (id) => {
-    if (window.confirm("Tem certeza que deseja excluir este profissional?")) {
-      setProfissionais(profissionais.filter(profissional => profissional.id !== id));
+  const excluirProfissional = async (id) => {
+    // find professional for name
+    const p = profissionais.find(x => x.id === id) || {};
+    if (!window.confirm(`Tem certeza que deseja excluir o profissional "${p.nome || ''}"?`)) return;
+
+    setMessage({ text: "", type: "" });
+    setLoading(true);
+    try {
+      const response = await apiService.profissionais.deletar(id);
+      let successMessage = 'Profissional excluído com sucesso';
+      if (response && typeof response === 'object' && response.Sucesso) {
+        successMessage = response.Sucesso;
+      }
+      setMessage({ text: successMessage, type: 'success' });
+      await carregarProfissionais();
+      setTimeout(() => setMessage({ text: "", type: "" }), 2500);
       if (modalEditarOpen) fecharModalEditar();
+    } catch (error) {
+      console.error('❌ Erro ao excluir profissional:', error);
+      setMessage({ text: error.message || 'Erro ao excluir profissional', type: 'error' });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,6 +258,24 @@ export default function GerenciamentoProfissionais() {
               Novo Profissional
             </button>
           </div>
+
+          {/* Mensagem global */}
+          {message.text && (
+            <div style={{marginBottom: 16}}>
+              <div
+                className={`gp-message ${message.type}`}
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 8,
+                  backgroundColor: message.type === 'success' ? '#dcfce7' : '#fee2e2',
+                  border: `1px solid ${message.type === 'success' ? '#86efac' : '#fecaca'}`,
+                  color: message.type === 'success' ? '#166534' : '#dc2626'
+                }}
+              >
+                {message.text}
+              </div>
+            </div>
+          )}
 
           {/* Card de Resumo */}
           <div className="gp-resumo-card">
@@ -201,7 +361,14 @@ export default function GerenciamentoProfissionais() {
                 </tr>
               </thead>
               <tbody>
-                {profissionaisFiltrados.length === 0 ? (
+                {loadingProfissionais ? (
+                  <tr>
+                    <td colSpan="6" className="gp-empty-state">
+                      <span className="material-symbols-outlined">hourglass_empty</span>
+                      <p>Carregando profissionais...</p>
+                    </td>
+                  </tr>
+                ) : profissionaisFiltrados.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="gp-empty-state">
                       <span className="material-symbols-outlined">search_off</span>
@@ -255,6 +422,17 @@ export default function GerenciamentoProfissionais() {
             <div className="gp-modal-overlay" onClick={fecharModalNovo}>
               <div className="gp-modal" onClick={e => e.stopPropagation()}>
                 <h3>👨‍💼 Novo Profissional</h3>
+                {/* feedback message inside modal */}
+                {message.text && (
+                  <div style={{marginBottom: 12}}>
+                    <div style={{
+                      padding: '10px', borderRadius: 6,
+                      backgroundColor: message.type === 'success' ? '#dcfce7' : '#fee2e2',
+                      border: `1px solid ${message.type === 'success' ? '#86efac' : '#fecaca'}`,
+                      color: message.type === 'success' ? '#166534' : '#b91c1c'
+                    }}>{message.text}</div>
+                  </div>
+                )}
                 <form onSubmit={salvarNovoProfissional}>
                   <div className="gp-form-group">
                     <label>Nome Completo *</label>
@@ -293,11 +471,20 @@ export default function GerenciamentoProfissionais() {
                       required
                     >
                       <option value="">Selecione uma especialidade</option>
-                      <option value="Corte Masculino">Corte Masculino</option>
-                      <option value="Corte Feminino">Corte Feminino</option>
-                      <option value="Colorização">Colorização</option>
-                      <option value="Barba e Estilo">Barba e Estilo</option>
-                      <option value="Corte Social">Corte Social</option>
+                      {especialidades.length > 0 ? (
+                        especialidades.map((esp, idx) => (
+                          <option key={idx} value={typeof esp === 'string' ? esp : (esp.nome || esp.label || JSON.stringify(esp))}>
+                            {typeof esp === 'string' ? esp : (esp.nome || esp.label || JSON.stringify(esp))}
+                          </option>
+                        ))
+                      ) : (
+                        // fallback to some common options if API returns nothing
+                        <>
+                          <option value="Corte Masculino">Corte Masculino</option>
+                          <option value="Corte Feminino">Corte Feminino</option>
+                          <option value="Colorização">Colorização</option>
+                        </>
+                      )}
                     </select>
                   </div>
                   <div className="gp-form-group">
@@ -314,9 +501,12 @@ export default function GerenciamentoProfissionais() {
                     <button type="button" onClick={fecharModalNovo} className="gp-btn-cancel">
                       Cancelar
                     </button>
-                    <button type="submit" className="gp-btn-save">
-                      <span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>save</span>
-                      Salvar Profissional
+                    <button type="submit" className="gp-btn-save" disabled={loading}>
+                      {loading ? (
+                        <><span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>hourglass_empty</span> Cadastrando...</>
+                      ) : (
+                        <><span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>save</span> Salvar Profissional</>
+                      )}
                     </button>
                   </div>
                 </form>
@@ -329,6 +519,17 @@ export default function GerenciamentoProfissionais() {
             <div className="gp-modal-overlay" onClick={fecharModalEditar}>
               <div className="gp-modal" onClick={e => e.stopPropagation()}>
                 <h3>✏️ Editar Profissional</h3>
+                {/* feedback message inside edit modal */}
+                {message.text && (
+                  <div style={{marginBottom: 12}}>
+                    <div style={{
+                      padding: '10px', borderRadius: 6,
+                      backgroundColor: message.type === 'success' ? '#dcfce7' : '#fee2e2',
+                      border: `1px solid ${message.type === 'success' ? '#86efac' : '#fecaca'}`,
+                      color: message.type === 'success' ? '#166534' : '#b91c1c'
+                    }}>{message.text}</div>
+                  </div>
+                )}
                 <form onSubmit={salvarEdicaoProfissional}>
                   <div className="gp-form-group">
                     <label>Nome Completo *</label>
@@ -363,11 +564,19 @@ export default function GerenciamentoProfissionais() {
                       onChange={e => setProfissionalEditando({ ...profissionalEditando, especialidade: e.target.value })}
                       required
                     >
-                      <option value="Corte Masculino">Corte Masculino</option>
-                      <option value="Corte Feminino">Corte Feminino</option>
-                      <option value="Colorização">Colorização</option>
-                      <option value="Barba e Estilo">Barba e Estilo</option>
-                      <option value="Corte Social">Corte Social</option>
+                      {especialidades.length > 0 ? (
+                        especialidades.map((esp, idx) => (
+                          <option key={idx} value={typeof esp === 'string' ? esp : (esp.nome || esp.label || JSON.stringify(esp))}>
+                            {typeof esp === 'string' ? esp : (esp.nome || esp.label || JSON.stringify(esp))}
+                          </option>
+                        ))
+                      ) : (
+                        <>
+                          <option value="Corte Masculino">Corte Masculino</option>
+                          <option value="Corte Feminino">Corte Feminino</option>
+                          <option value="Colorização">Colorização</option>
+                        </>
+                      )}
                     </select>
                   </div>
                   <div className="gp-form-group">
@@ -385,17 +594,21 @@ export default function GerenciamentoProfissionais() {
                       type="button" 
                       onClick={() => excluirProfissional(profissionalEditando.id)}
                       className="gp-btn-delete-modal"
+                      disabled={loading}
                     >
                       <span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>delete</span>
-                      Excluir
+                      {loading ? 'Processando...' : 'Excluir'}
                     </button>
                     <div className="gp-modal-buttons-right">
                       <button type="button" onClick={fecharModalEditar} className="gp-btn-cancel">
                         Cancelar
                       </button>
-                      <button type="submit" className="gp-btn-save">
-                        <span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>save</span>
-                        Salvar
+                      <button type="submit" className="gp-btn-save" disabled={loading}>
+                        {loading ? (
+                          <><span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>hourglass_empty</span> Salvando...</>
+                        ) : (
+                          <><span className="material-symbols-outlined" style={{fontSize: '1.1rem', marginRight: '0.25rem'}}>save</span> Salvar</>
+                        )}
                       </button>
                     </div>
                   </div>
