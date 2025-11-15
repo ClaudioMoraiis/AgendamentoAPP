@@ -44,7 +44,8 @@ export default function GerenciamentoProfissionais() {
         telefone: p.telefone,
         // store as-is (likely a string name) but ensure string when it's a primitive
         especialidade: typeof p.especialidade === 'string' ? p.especialidade : (p.especialidade ? String(p.especialidade) : ''),
-        status: String(p.status)
+        // If backend returns boolean 'ativo', map to 'ativo'/'inativo' strings for the UI select
+        status: (typeof p.ativo === 'boolean') ? (p.ativo ? 'ativo' : 'inativo') : String(p.status)
       })) : [];
       console.log('👷 Profissionais carregados:', list.map(x => ({nome: x.nome, id: x.id}))); 
       setProfissionais(list);

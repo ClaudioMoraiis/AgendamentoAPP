@@ -315,31 +315,38 @@ export const apiService = {
     // Criar profissional (admin - requer token)
     // Endpoint solicitado: POST /profissional/cadastrar
     criar: (profissionalData) => {
-      console.log('🔄 API profissional cadastrar - Dados:', profissionalData);
+      const ativoFlag = profissionalData.status === 'ativo' || profissionalData.ativo === true;
+      const payload = {
+        nome: profissionalData.nome,
+        telefone: profissionalData.telefone,
+        especialidade: profissionalData.especialidade,
+        email: profissionalData.email,
+        // include boolean 'ativo' as requested by backend integration
+        ativo: !!ativoFlag
+      };
+      console.log('🔄 API profissional cadastrar - Payload:', payload);
       return makeAuthenticatedRequest("/profissional/cadastrar", {
         method: "POST",
-        body: JSON.stringify({
-          nome: profissionalData.nome,
-          telefone: profissionalData.telefone,
-          especialidade: profissionalData.especialidade,
-          email: profissionalData.email,
-          status: profissionalData.status
-        }),
+        body: JSON.stringify(payload),
       });
     },
 
     // Atualizar profissional (admin)
-    atualizar: (id, profissionalData) =>
-      makeAuthenticatedRequest(`/profissional/${id}`, {
+    atualizar: (id, profissionalData) => {
+      const ativoFlag = profissionalData.status === 'ativo' || profissionalData.ativo === true;
+      const payload = {
+        nome: profissionalData.nome,
+        telefone: profissionalData.telefone,
+        especialidade: profissionalData.especialidade,
+        email: profissionalData.email,
+        ativo: !!ativoFlag
+      };
+      console.log('🔄 API profissional atualizar - ID:', id, 'Payload:', payload);
+      return makeAuthenticatedRequest(`/profissional/${id}`, {
         method: "PUT",
-        body: JSON.stringify({
-          nome: profissionalData.nome,
-          telefone: profissionalData.telefone,
-          especialidade: profissionalData.especialidade,
-          email: profissionalData.email,
-          status: profissionalData.status
-        }),
-      }),
+        body: JSON.stringify(payload),
+      });
+    },
 
     // Deletar profissional (admin)
     deletar: (id) =>
