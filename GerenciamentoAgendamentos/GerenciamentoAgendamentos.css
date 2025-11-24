@@ -554,16 +554,37 @@
 .ga-modal {
   background: var(--white);
   border-radius: 1rem;
-  padding: 2rem;
+  padding: 0;
   width: 100%;
   max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-height: 85vh;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   animation: ga-modalSlideUp 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .ga-modal h3 {
+  padding: 1.5rem 2rem 0 2rem;
+  margin: 0 0 1rem 0;
+  flex-shrink: 0;
+}
+
+.ga-modal form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ga-modal-form-fields {
+  padding: 0 2rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.ga-modal h3:not(.ga-modal h3:first-child) {
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--primary);
@@ -596,6 +617,30 @@
   transition: all 0.2s;
 }
 
+/* Checkbox row for compact checkbox + label */
+.ga-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ga-checkbox-row input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.ga-checkbox-row label {
+  display: inline-block;
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--foreground-light);
+  cursor: pointer;
+}
+
 .ga-form-group input:focus,
 .ga-form-group select:focus {
   outline: none;
@@ -613,11 +658,14 @@
 /* Botões do Modal */
 .ga-modal-buttons {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   gap: 1rem;
-  margin-top: 1.5rem;
-  flex-wrap: wrap;
+  margin: 0;
+  padding: 1.5rem 2rem;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border-light);
+  background: var(--white);
 }
 
 .ga-modal-buttons-right {
@@ -1008,3 +1056,173 @@
 
 .ga-table-container::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
+}
+
+/* Responsividade adicional para tablets */
+@media (max-width: 1024px) {
+  .ga-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ga-header-title h1 {
+    font-size: 1.5rem;
+  }
+
+  .ga-header-actions {
+    justify-content: space-between;
+  }
+
+  .ga-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ga-filters {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .ga-table th,
+  .ga-table td {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Responsividade para mobile */
+@media (max-width: 640px) {
+  .ga-header-title h1 {
+    font-size: 1.25rem;
+  }
+
+  .ga-header-title p {
+    font-size: 0.75rem;
+  }
+
+  .ga-btn-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .ga-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ga-stat-card {
+    padding: 1rem;
+  }
+
+  .ga-stat-value {
+    font-size: 1.5rem;
+  }
+
+  .ga-filters {
+    gap: 0.5rem;
+  }
+
+  .ga-search-input,
+  .ga-select {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+  }
+
+  /* Hide less important columns on mobile */
+  .ga-table th:nth-child(3),
+  .ga-table td:nth-child(3),
+  .ga-table th:nth-child(5),
+  .ga-table td:nth-child(5),
+  .ga-table th:nth-child(6),
+  .ga-table td:nth-child(6) {
+    display: none;
+  }
+
+  .ga-table th,
+  .ga-table td {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .ga-status-badge {
+    font-size: 0.625rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .ga-btn-action {
+    padding: 0.375rem;
+  }
+
+  .ga-btn-action .material-symbols-outlined {
+    font-size: 1.125rem;
+  }
+
+  /* Modal responsiveness */
+  .ga-modal {
+    padding: 0;
+    max-width: 95%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .ga-modal h3 {
+    font-size: 1.125rem;
+    margin: 1rem 1rem 0.75rem 1rem;
+    flex-shrink: 0;
+  }
+
+  .ga-modal form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .ga-modal form > div:not(.ga-modal-buttons) {
+    padding: 0 1rem;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .ga-form-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .ga-form-group label {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .ga-form-group input,
+  .ga-form-group select {
+    font-size: 0.875rem;
+    padding: 0.625rem;
+  }
+
+  .ga-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ga-modal-buttons {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 0.75rem !important;
+    margin: 0 !important;
+    padding: 1rem !important;
+    border-top: 1px solid var(--border-light);
+    flex-shrink: 0;
+    background: var(--white);
+  }
+
+  .ga-modal-buttons button {
+    flex: 1 !important;
+    min-height: 44px !important;
+    font-size: 0.875rem !important;
+    max-width: 200px;
+  }
+
+  .ga-btn-cancel,
+  .ga-btn-save {
+    padding: 0.625rem 1rem !important;
+  }
+}

@@ -251,22 +251,80 @@ export const apiService = {
         method: "POST",
         body: JSON.stringify(agendamentoData),
       }),
+    // Registrar agendamento via rota alternativa usada pelo admin
+    // This helper returns an object { status, data } (does not throw on HTTP error)
+    registrar: async (agendamentoData) => {
+      const url = `${API_BASE_URL}/agendamento/register`;
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+
+      console.log('🔑 Token sendo enviado:', token.substring(0, 20) + '...');
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(agendamentoData),
+        });
+
+        const contentType = response.headers.get('content-type');
+        let data;
+        if (contentType && contentType.includes('application/json')) {
+          data = await response.json();
+        } else {
+          data = await response.text();
+        }
+
+        // Do not throw here; return status + data so caller can decide how to handle 2xx/202/4xx
+        return { status: response.status, data };
+      } catch (error) {
+        console.error('Erro na requisição para /agendamento/register:', error);
+        throw error;
+      }
+    },
 
     // Listar agendamentos do usuário
     meus: () => makeAuthenticatedRequest("/agendamentos/meus"),
 
     // Listar todos os agendamentos (admin)
-    listar: () => makeAuthenticatedRequest("/agendamentos"),
+    listar: () => makeAuthenticatedRequest("/agendamento/listar"),
 
     // Buscar agendamento por ID
     buscarPorId: (id) => makeAuthenticatedRequest(`/agendamentos/${id}`),
 
     // Atualizar agendamento
-    atualizar: (id, agendamentoData) =>
-      makeAuthenticatedRequest(`/agendamentos/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(agendamentoData),
-      }),
+    atualizar: async (id, agendamentoData) => {
+      const url = `${API_BASE_URL}/agendamento/${id}`;
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("Token de autenticação não encontrado. Faça login novamente.");
+
+      try {
+        const response = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(agendamentoData),
+        });
+
+        const contentType = response.headers.get('content-type');
+        let data;
+        if (contentType && contentType.includes('application/json')) {
+          data = await response.json();
+        } else {
+          data = await response.text();
+        }
+
+        return { status: response.status, data };
+      } catch (error) {
+        console.error('Erro na requisição de atualizar agendamento:', error);
+        throw error;
+      }
+    },
 
     // Cancelar agendamento
     cancelar: (id) =>
@@ -276,7 +334,7 @@ export const apiService = {
 
     // Deletar agendamento (admin)
     deletar: (id) =>
-      makeAuthenticatedRequest(`/agendamentos/${id}`, {
+      makeAuthenticatedRequest(`/agendamento/${id}`, {
         method: "DELETE",
       }),
   },
@@ -285,6 +343,12 @@ export const apiService = {
   servicos: {
     // Listar serviços
     listar: () => makeAuthenticatedRequest("/servico/listar"),
+
+    // Buscar ID do serviço por nome e preço (ex: /servico/id?name=BARBA&price=35)
+    buscarIdPorNomePreco: (name, price) => {
+      const params = new URLSearchParams({ name: name, price: String(price) });
+      return makeAuthenticatedRequest(`/servico/id?${params.toString()}`);
+    },
 
     // Criar serviço (admin)
     criar: (servicoData) =>
@@ -311,6 +375,8 @@ export const apiService = {
   profissionais: {
     // Listar profissionais (admin - requer token)
     listar: () => makeAuthenticatedRequest("/profissional/listar"),
+    // Buscar profissional por código/nome (ex: /profissional/claudio1)
+    buscarPorCodigo: (codigo) => makeAuthenticatedRequest(`/profissional/${encodeURIComponent(codigo)}`),
 
     // Criar profissional (admin - requer token)
     // Endpoint solicitado: POST /profissional/cadastrar

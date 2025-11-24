@@ -67,6 +67,19 @@ const Login = () => {
       if (email.toUpperCase() === "ADM@GMAIL.COM") {
         console.log('👑 Usuário administrativo detectado, redirecionando para dashboard');
         localStorage.setItem("role", "admin");
+        // Antes de redirecionar, tenta carregar lista de profissionais para uso no admin
+        try {
+          const profsResp = await apiService.profissionais.listar();
+          const profs = Array.isArray(profsResp)
+            ? profsResp.map(p => ({ id: p.id, nome: p.nome, codigo: p.codigo || p.nome }))
+            : [];
+          localStorage.setItem('profissionaisList', JSON.stringify(profs));
+          console.log('💾 Profissionais salvos em localStorage:', profs.length);
+        } catch (err) {
+          console.warn('⚠️ Não foi possível carregar profissionais após login:', err.message || err);
+          // Não interrompe o fluxo de login; apenas prossegue para a dashboard
+        }
+
         navigateTo.dashboard(); // Redireciona para o dashboard administrativo
       } else {
         console.log('👤 Usuário cliente, redirecionando para serviços');
