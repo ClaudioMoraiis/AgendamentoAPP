@@ -44,8 +44,16 @@ export default function GerenciamentoProfissionais() {
         telefone: p.telefone,
         // store as-is (likely a string name) but ensure string when it's a primitive
         especialidade: typeof p.especialidade === 'string' ? p.especialidade : (p.especialidade ? String(p.especialidade) : ''),
-        // If backend returns boolean 'ativo', map to 'ativo'/'inativo' strings for the UI select
-        status: (typeof p.ativo === 'boolean') ? (p.ativo ? 'ativo' : 'inativo') : String(p.status)
+        // Map backend ativo field (TRUE/FALSE string or boolean) to UI status (ativo/inativo)
+        status: (() => {
+          if (typeof p.ativo === 'boolean') return p.ativo ? 'ativo' : 'inativo';
+          if (typeof p.ativo === 'string') return p.ativo.toUpperCase() === 'TRUE' ? 'ativo' : 'inativo';
+          if (typeof p.status === 'string') {
+            const s = p.status.toLowerCase();
+            return s === 'ativo' || s === 'true' ? 'ativo' : 'inativo';
+          }
+          return 'inativo';
+        })()
       })) : [];
       console.log('👷 Profissionais carregados:', list.map(x => ({nome: x.nome, id: x.id}))); 
       setProfissionais(list);
@@ -384,14 +392,9 @@ export default function GerenciamentoProfissionais() {
                       <td className="gp-hide-md">{profissional.telefone}</td>
                       <td>{profissional.especialidade}</td>
                       <td>
-                        <select
-                          value={profissional.status}
-                          onChange={(e) => alterarStatus(profissional.id, e.target.value)}
-                          className="gp-status-select"
-                        >
-                          <option value="ativo">Ativo</option>
-                          <option value="inativo">Inativo</option>
-                        </select>
+                        <span className={`gp-status-badge gp-status-${profissional.status}`}>
+                          {profissional.status === 'ativo' ? 'Ativo' : 'Inativo'}
+                        </span>
                       </td>
                       <td className="gp-cell-actions">
                         <div className="gp-actions-buttons">
