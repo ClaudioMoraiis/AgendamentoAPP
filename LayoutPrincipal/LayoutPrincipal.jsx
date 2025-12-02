@@ -40,6 +40,8 @@ export default function LayoutPrincipal({ children, paginaAtiva = "dashboard" })
     { key: "clientes", label: "Clientes", icon: "group", href: ROUTES.GERENCIAMENTO_CLIENTES },
     { key: "agendamentos", label: "Agendamentos", icon: "calendar_month", href: ROUTES.GERENCIAMENTO_AGENDAMENTOS },
     { key: "profissionais", label: "Profissionais", icon: "person", href: ROUTES.GERENCIAMENTO_PROFISSIONAIS },
+    { key: "especialidades", label: "Especialidades", icon: "category", href: ROUTES.GERENCIAMENTO_ESPECIALIDADES },
+    { key: "horarios", label: "Horários", icon: "schedule", href: ROUTES.GERENCIAMENTO_HORARIOS },
   ];
 
   return (

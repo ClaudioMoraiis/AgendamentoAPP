@@ -107,6 +107,13 @@ export default function GerenciamentoAgendamentos() {
   const [saving, setSaving] = useState(false);
   const [servicos, setServicos] = useState(servicosComValores);
   const [loadingServicos, setLoadingServicos] = useState(false);
+  
+  // Estados para modal de busca de clientes
+  const [modalClientesOpen, setModalClientesOpen] = useState(false);
+  const [clientes, setClientes] = useState([]);
+  const [loadingClientes, setLoadingClientes] = useState(false);
+  const [buscaCliente, setBuscaCliente] = useState('');
+  const [modoEdicao, setModoEdicao] = useState(false); // Controla se está no modo novo ou editar
 
   useEffect(() => {
     carregarServicos();
@@ -166,6 +173,37 @@ export default function GerenciamentoAgendamentos() {
       console.error('Erro ao carregar agendamentos:', err);
       setAgendamentos([]);
     }
+  };
+
+  const carregarClientes = async () => {
+    try {
+      setLoadingClientes(true);
+      const resp = await apiService.usuarios.listar();
+      console.log('👥 Clientes carregados:', resp);
+      setClientes(Array.isArray(resp) ? resp : []);
+    } catch (err) {
+      console.error('Erro ao carregar clientes:', err);
+      setClientes([]);
+    } finally {
+      setLoadingClientes(false);
+    }
+  };
+
+  const abrirModalClientes = (isEdit = false) => {
+    setModoEdicao(isEdit);
+    setBuscaCliente('');
+    carregarClientes();
+    setModalClientesOpen(true);
+  };
+
+  const selecionarCliente = (cliente) => {
+    const nomeCliente = cliente.nome || cliente.name || '';
+    if (modoEdicao) {
+      setAgendamentoEditando({ ...agendamentoEditando, cliente: nomeCliente });
+    } else {
+      setNovoAgendamento({ ...novoAgendamento, cliente: nomeCliente });
+    }
+    setModalClientesOpen(false);
   };
 
   const carregarServicos = async () => {
@@ -1075,13 +1113,23 @@ export default function GerenciamentoAgendamentos() {
               <div className="ga-modal-form-fields">
                 <div className="ga-form-group">
                   <label>Cliente *</label>
-                <input
-                  type="text"
-                  value={novoAgendamento.cliente}
-                  onChange={(e) => setNovoAgendamento({ ...novoAgendamento, cliente: e.target.value })}
-                  placeholder="Nome do cliente"
-                  required
-                />
+                  <div className="ga-input-with-icon">
+                    <input
+                      type="text"
+                      value={novoAgendamento.cliente}
+                      onChange={(e) => setNovoAgendamento({ ...novoAgendamento, cliente: e.target.value })}
+                      placeholder="Nome do cliente"
+                      required
+                    />
+                    <button 
+                      type="button" 
+                      className="ga-btn-search"
+                      onClick={() => abrirModalClientes(false)}
+                      title="Buscar cliente cadastrado"
+                    >
+                      <span className="material-symbols-outlined">search</span>
+                    </button>
+                  </div>
               </div>
 
               <div className="ga-form-group ga-checkbox-row">
@@ -1203,13 +1251,23 @@ export default function GerenciamentoAgendamentos() {
               <div className="ga-modal-form-fields">
                 <div className="ga-form-group">
                   <label>Cliente *</label>
-                  <input
-                    type="text"
-                    value={agendamentoEditando.cliente}
-                    readOnly
-                    className="ga-input-readonly"
-                    required
-                  />
+                  <div className="ga-input-with-icon">
+                    <input
+                      type="text"
+                      value={agendamentoEditando.cliente}
+                      onChange={(e) => setAgendamentoEditando({ ...agendamentoEditando, cliente: e.target.value })}
+                      placeholder="Nome do cliente"
+                      required
+                    />
+                    <button 
+                      type="button" 
+                      className="ga-btn-search"
+                      onClick={() => abrirModalClientes(true)}
+                      title="Buscar cliente cadastrado"
+                    >
+                      <span className="material-symbols-outlined">search</span>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="ga-checkbox-group">
@@ -1253,7 +1311,11 @@ export default function GerenciamentoAgendamentos() {
                 <label>Profissional *</label>
                 <select
                   value={agendamentoEditando.profissional}
-                  onChange={(e) => setAgendamentoEditando({ ...agendamentoEditando, profissional: e.target.value })}
+                  onChange={(e) => setAgendamentoEditando({ 
+                    ...agendamentoEditando, 
+                    profissional: e.target.value,
+                    profissionalId: null // Clear cached ID to force lookup
+                  })}
                   required
                 >
                   <option value="">Selecione um profissional</option>
@@ -1308,6 +1370,77 @@ export default function GerenciamentoAgendamentos() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Buscar Clientes */}
+      {modalClientesOpen && (
+        <div className="ga-modal-overlay" onClick={() => setModalClientesOpen(false)}>
+          <div className="ga-modal ga-modal-clientes" onClick={(e) => e.stopPropagation()}>
+            <h3>Selecionar Cliente</h3>
+            
+            <div className="ga-search-box">
+              <span className="material-symbols-outlined">search</span>
+              <input
+                type="text"
+                value={buscaCliente}
+                onChange={(e) => setBuscaCliente(e.target.value)}
+                placeholder="Buscar por nome, email ou CPF..."
+                autoFocus
+              />
+            </div>
+
+            <div className="ga-clientes-list">
+              {loadingClientes ? (
+                <div className="ga-loading">Carregando clientes...</div>
+              ) : (
+                clientes
+                  .filter(c => {
+                    if (!buscaCliente) return true;
+                    const busca = buscaCliente.toLowerCase();
+                    const nome = (c.nome || c.name || '').toLowerCase();
+                    const email = (c.email || '').toLowerCase();
+                    const cpf = (c.cpf || '').replace(/\D/g, '');
+                    return nome.includes(busca) || email.includes(busca) || cpf.includes(busca);
+                  })
+                  .map(cliente => (
+                    <div 
+                      key={cliente.id} 
+                      className="ga-cliente-item"
+                      onDoubleClick={() => selecionarCliente(cliente)}
+                    >
+                      <div className="ga-cliente-info">
+                        <div className="ga-cliente-nome">{cliente.nome || cliente.name}</div>
+                        <div className="ga-cliente-detalhes">
+                          {cliente.email && <span>{cliente.email}</span>}
+                          {cliente.celular && <span className="ga-cliente-telefone">{cliente.celular}</span>}
+                        </div>
+                      </div>
+                      <button 
+                        type="button"
+                        className="ga-btn-selecionar"
+                        onClick={() => selecionarCliente(cliente)}
+                      >
+                        Selecionar
+                      </button>
+                    </div>
+                  ))
+              )}
+              {!loadingClientes && clientes.length === 0 && (
+                <div className="ga-empty-state">Nenhum cliente cadastrado</div>
+              )}
+            </div>
+
+            <div className="ga-modal-buttons">
+              <button 
+                type="button" 
+                onClick={() => setModalClientesOpen(false)} 
+                className="ga-btn-cancel"
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         </div>
       )}

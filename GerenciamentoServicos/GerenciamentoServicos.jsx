@@ -14,6 +14,21 @@ export default function GerenciamentoServicos() {
   // Estados para notificações
   const [notification, setNotification] = useState({ show: false, message: "", type: "" });
 
+  // Função para converter HH:MM para minutos totais
+  const converterHoraParaMinutos = (hora) => {
+    if (!hora) return 0;
+    const [horas, minutos] = hora.split(':').map(Number);
+    return (horas * 60) + minutos;
+  };
+
+  // Função para converter minutos totais para HH:MM
+  const converterMinutosParaHora = (minutos) => {
+    if (!minutos) return '00:00';
+    const horas = Math.floor(minutos / 60);
+    const mins = minutos % 60;
+    return `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+  };
+
   // Função para mostrar notificação
   const showNotification = (message, type = "success") => {
     setNotification({ show: true, message, type });
@@ -32,7 +47,13 @@ export default function GerenciamentoServicos() {
       setLoading(true);
       const response = await apiService.servicos.listar();
       console.log('✅ Serviços carregados:', response);
-      setServicos(response || []);
+      // Converter minutos para HH:MM para exibição
+      const servicosFormatados = (response || []).map(s => ({
+        ...s,
+        duracaoMinutos: s.duracao, // Guardar o valor em minutos
+        duracao: typeof s.duracao === 'number' ? converterMinutosParaHora(s.duracao) : s.duracao
+      }));
+      setServicos(servicosFormatados);
     } catch (error) {
       console.error('❌ Erro ao carregar serviços:', error);
       const errorMessage = error.message || 'Erro ao carregar serviços. Tente novamente.';
@@ -70,9 +91,10 @@ export default function GerenciamentoServicos() {
     }
     
     try {
+      const duracaoMinutos = converterHoraParaMinutos(novoServico.duracao);
       const servicoData = {
         nome: novoServico.nome,
-        duracao: novoServico.duracao,
+        duracao: duracaoMinutos,
         preco: parseFloat(novoServico.valor)
       };
       
@@ -96,9 +118,10 @@ export default function GerenciamentoServicos() {
     }
     
     try {
+      const duracaoMinutos = converterHoraParaMinutos(servicoEditando.duracao);
       const servicoData = {
         nome: servicoEditando.nome,
-        duracao: servicoEditando.duracao,
+        duracao: duracaoMinutos,
         preco: parseFloat(servicoEditando.valor)
       };
       
@@ -237,14 +260,14 @@ export default function GerenciamentoServicos() {
                 required
               />
 
-              <label>Duração</label>
+              <label>Duração (HH:MM)</label>
               <input
-                type="text"
+                type="time"
                 value={novoServico.duracao}
                 onChange={(e) =>
                   setNovoServico({ ...novoServico, duracao: e.target.value })
                 }
-                placeholder="Ex: 30 minutos"
+                placeholder="Ex: 01:30"
                 required
               />
 
@@ -292,14 +315,14 @@ export default function GerenciamentoServicos() {
                 required
               />
 
-              <label>Duração</label>
+              <label>Duração (HH:MM)</label>
               <input
-                type="text"
+                type="time"
                 value={servicoEditando.duracao}
                 onChange={(e) =>
                   setServicoEditando({ ...servicoEditando, duracao: e.target.value })
                 }
-                placeholder="Ex: 30 minutos"
+                placeholder="Ex: 01:30"
                 required
               />
 

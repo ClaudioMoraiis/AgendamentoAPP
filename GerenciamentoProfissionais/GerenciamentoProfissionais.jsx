@@ -154,7 +154,7 @@ export default function GerenciamentoProfissionais() {
         telefone: novoProfissional.telefone || "",
         especialidade: novoProfissional.especialidade,
         email: novoProfissional.email,
-        status: novoProfissional.status || "true"
+        ativo: novoProfissional.status === "ativo" ? true : false
       };
       const response = await apiService.profissionais.criar(payload);
 
@@ -198,7 +198,7 @@ export default function GerenciamentoProfissionais() {
         telefone: profissionalEditando.telefone,
         especialidade: profissionalEditando.especialidade,
         email: profissionalEditando.email,
-        status: profissionalEditando.status
+        ativo: profissionalEditando.status === "ativo" ? true : false
       });
 
       let successMessage = 'Profissional alterado com sucesso';

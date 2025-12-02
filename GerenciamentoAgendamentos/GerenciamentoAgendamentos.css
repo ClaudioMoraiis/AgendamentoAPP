@@ -1226,3 +1226,146 @@
     padding: 0.625rem 1rem !important;
   }
 }
+
+/* Input com ícone de busca */
+.ga-input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.ga-input-with-icon input {
+  width: 100%;
+  padding-right: 3rem;
+}
+
+.ga-btn-search {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.ga-btn-search:hover {
+  background: rgba(19, 127, 236, 0.1);
+}
+
+.ga-btn-search .material-symbols-outlined {
+  font-size: 1.25rem;
+}
+
+/* Modal de Clientes */
+.ga-modal-clientes {
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.ga-search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--background-light);
+  margin-bottom: 1rem;
+}
+
+.ga-search-box .material-symbols-outlined {
+  color: var(--subtle-light);
+  font-size: 1.25rem;
+}
+
+.ga-search-box input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  padding: 0;
+}
+
+.ga-clientes-list {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  max-height: 400px;
+  margin-bottom: 1rem;
+}
+
+.ga-cliente-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ga-cliente-item:last-child {
+  border-bottom: none;
+}
+
+.ga-cliente-item:hover {
+  background: var(--background-light);
+}
+
+.ga-cliente-info {
+  flex: 1;
+}
+
+.ga-cliente-nome {
+  font-weight: 600;
+  color: var(--foreground-light);
+  margin-bottom: 0.25rem;
+}
+
+.ga-cliente-detalhes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--subtle-light);
+}
+
+.ga-cliente-telefone {
+  color: var(--primary);
+}
+
+.ga-btn-selecionar {
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+.ga-btn-selecionar:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.ga-loading,
+.ga-empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--subtle-light);
+  font-size: 0.95rem;
+}

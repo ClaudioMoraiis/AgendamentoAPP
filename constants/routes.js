@@ -18,6 +18,8 @@ export const ROUTES = {
   GERENCIAMENTO_CLIENTES: '/admin/clientes',
   GERENCIAMENTO_AGENDAMENTOS: '/admin/agendamentos',
   GERENCIAMENTO_PROFISSIONAIS: '/admin/profissionais',
+  GERENCIAMENTO_ESPECIALIDADES: '/admin/especialidades',
+  GERENCIAMENTO_HORARIOS: '/admin/horarios',
 };
 
 // Configuração da navegação para diferentes tipos de usuários
@@ -64,6 +66,16 @@ export const NAVIGATION_ITEMS = {
       label: 'Profissionais',
       path: ROUTES.GERENCIAMENTO_PROFISSIONAIS,
       icon: 'person'
+    },
+    {
+      label: 'Especialidades',
+      path: ROUTES.GERENCIAMENTO_ESPECIALIDADES,
+      icon: 'category'
+    },
+    {
+      label: 'Horários',
+      path: ROUTES.GERENCIAMENTO_HORARIOS,
+      icon: 'schedule'
     }
   ]
 };

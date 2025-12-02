@@ -203,6 +203,214 @@
   padding: 2rem 0;
 }
 
+.meusagend-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 1rem;
+  color: #6b7280;
+}
+
+.meusagend-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid #e5e7eb;
+  border-top-color: #137fec;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.meusagend-error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.meusagend-error .material-symbols-outlined {
+  font-size: 1.5rem;
+}
+
+.meusagend-retry-btn {
+  margin-left: auto;
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.meusagend-retry-btn:hover {
+  background: #b91c1c;
+}
+
+.meusagend-sucesso {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  padding: 1rem 1.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+}
+
+.meusagend-sucesso .material-symbols-outlined {
+  font-size: 1.5rem;
+}
+
+/* Modal de Confirmação */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #111418;
+}
+
+.modal-icon-warning {
+  font-size: 2rem;
+  color: #f59e0b;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-body > p {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.modal-agendamento-info {
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.modal-agendamento-info p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.modal-btn-cancelar,
+.modal-btn-confirmar {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-size: 0.95rem;
+}
+
+.modal-btn-cancelar {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.modal-btn-cancelar:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.modal-btn-confirmar {
+  background: #dc2626;
+  color: white;
+}
+
+.modal-btn-confirmar:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.modal-btn-cancelar:disabled,
+.modal-btn-confirmar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 700px) {
   .meusagend-filtros {
     flex-direction: column;

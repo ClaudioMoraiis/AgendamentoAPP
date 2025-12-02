@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import LayoutPrincipal from '../LayoutPrincipal/LayoutPrincipal';
 import { useAppNavigation } from '../hooks/useAppNavigation';
+import { apiService } from '../services/api';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -13,75 +14,181 @@ const Dashboard = () => {
     totalClientes: 0,
     totalServicos: 0,
     receitaMes: 0,
-    agendamentosAbertos: 0
+    agendamentosAbertos: 0,
+    crescimentoAgendamentos: 0,
+    crescimentoClientes: 0,
+    crescimentoReceita: 0
   });
 
   const [agendamentosRecentes, setAgendamentosRecentes] = useState([]);
   const [servicosPopulares, setServicosPopulares] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Simular carregamento de dados (substituir por API real)
+  // Carregar dados reais das APIs
   useEffect(() => {
     const carregarDados = async () => {
       setLoading(true);
       
-      // Simular delay de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Dados fictícios (substituir por chamadas reais à API)
-      setStats({
-        totalAgendamentos: 147,
-        agendamentosHoje: 8,
-        totalClientes: 89,
-        totalServicos: 12,
-        receitaMes: 4850.00,
-        agendamentosAbertos: 23
-      });
+      try {
+        // Carregar dados em paralelo
+        const [agendamentos, usuarios, servicos] = await Promise.all([
+          apiService.agendamentos.listar().catch(err => { console.error('Erro ao carregar agendamentos:', err); return []; }),
+          apiService.usuarios.listar().catch(err => { console.error('Erro ao carregar usuários:', err); return []; }),
+          apiService.servicos.listar().catch(err => { console.error('Erro ao carregar serviços:', err); return []; })
+        ]);
 
-      setAgendamentosRecentes([
-        {
-          id: 1,
-          cliente: 'João Silva',
-          servico: 'Corte de Cabelo',
-          data: '2025-10-13',
-          hora: '14:30',
-          status: 'Confirmado'
-        },
-        {
-          id: 2,
-          cliente: 'Maria Santos',
-          servico: 'Barba + Corte',
-          data: '2025-10-13',
-          hora: '15:00',
-          status: 'Pendente'
-        },
-        {
-          id: 3,
-          cliente: 'Pedro Costa',
-          servico: 'Sobrancelha',
-          data: '2025-10-13',
-          hora: '16:00',
-          status: 'Confirmado'
-        },
-        {
-          id: 4,
-          cliente: 'Ana Oliveira',
-          servico: 'Corte de Cabelo',
-          data: '2025-10-14',
-          hora: '09:00',
-          status: 'Confirmado'
-        }
-      ]);
+        console.log('📊 Dados carregados:', { agendamentos, usuarios, servicos });
 
-      setServicosPopulares([
-        { nome: 'Corte de Cabelo', quantidade: 45, percentual: 38 },
-        { nome: 'Barba', quantidade: 28, percentual: 24 },
-        { nome: 'Corte + Barba', quantidade: 22, percentual: 19 },
-        { nome: 'Sobrancelha', quantidade: 15, percentual: 13 },
-        { nome: 'Outros', quantidade: 7, percentual: 6 }
-      ]);
+        // Processar agendamentos
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        
+        const agendamentosHoje = agendamentos.filter(a => {
+          if (!a.data) return false;
+          const dataAgendamento = new Date(a.data);
+          dataAgendamento.setHours(0, 0, 0, 0);
+          return dataAgendamento.getTime() === hoje.getTime();
+        });
 
-      setLoading(false);
+        const agendamentosPendentes = agendamentos.filter(a => 
+          a.status && a.status.toLowerCase() === 'pendente'
+        );
+
+        // Calcular métricas do mês atual e anterior
+        const mesAtual = hoje.getMonth();
+        const anoAtual = hoje.getFullYear();
+        
+        // Mês anterior
+        const mesAnterior = mesAtual === 0 ? 11 : mesAtual - 1;
+        const anoAnterior = mesAtual === 0 ? anoAtual - 1 : anoAtual;
+
+        // Agendamentos do mês atual e anterior
+        const agendamentosMesAtual = agendamentos.filter(a => {
+          if (!a.data) return false;
+          const dataAgendamento = new Date(a.data);
+          return dataAgendamento.getMonth() === mesAtual && 
+                 dataAgendamento.getFullYear() === anoAtual;
+        });
+
+        const agendamentosMesAnterior = agendamentos.filter(a => {
+          if (!a.data) return false;
+          const dataAgendamento = new Date(a.data);
+          return dataAgendamento.getMonth() === mesAnterior && 
+                 dataAgendamento.getFullYear() === anoAnterior;
+        });
+
+        // Receita do mês atual (agendamentos concluídos)
+        const receitaMes = agendamentosMesAtual
+          .filter(a => a.status && a.status.toLowerCase() === 'concluido')
+          .reduce((total, a) => {
+            const valor = typeof a.valor === 'string' 
+              ? parseFloat(a.valor.replace('R$', '').replace(',', '.').trim())
+              : a.valor;
+            return total + (isNaN(valor) ? 0 : valor);
+          }, 0);
+
+        // Receita do mês anterior (agendamentos concluídos)
+        const receitaMesAnterior = agendamentosMesAnterior
+          .filter(a => a.status && a.status.toLowerCase() === 'concluido')
+          .reduce((total, a) => {
+            const valor = typeof a.valor === 'string' 
+              ? parseFloat(a.valor.replace('R$', '').replace(',', '.').trim())
+              : a.valor;
+            return total + (isNaN(valor) ? 0 : valor);
+          }, 0);
+
+        // Clientes cadastrados no mês atual e anterior
+        const clientesMesAtual = usuarios.filter(u => {
+          if (!u.dataCadastro && !u.createdAt) return false;
+          const dataCadastro = new Date(u.dataCadastro || u.createdAt);
+          return dataCadastro.getMonth() === mesAtual && 
+                 dataCadastro.getFullYear() === anoAtual;
+        }).length;
+
+        const clientesMesAnterior = usuarios.filter(u => {
+          if (!u.dataCadastro && !u.createdAt) return false;
+          const dataCadastro = new Date(u.dataCadastro || u.createdAt);
+          return dataCadastro.getMonth() === mesAnterior && 
+                 dataCadastro.getFullYear() === anoAnterior;
+        }).length;
+
+        // Calcular crescimento percentual
+        const calcularCrescimento = (atual, anterior) => {
+          if (anterior === 0) return atual > 0 ? 100 : 0;
+          return Math.round(((atual - anterior) / anterior) * 100);
+        };
+
+        const crescimentoAgendamentos = calcularCrescimento(
+          agendamentosMesAtual.length,
+          agendamentosMesAnterior.length
+        );
+
+        const crescimentoClientes = calcularCrescimento(
+          clientesMesAtual,
+          clientesMesAnterior
+        );
+
+        const crescimentoReceita = calcularCrescimento(
+          receitaMes,
+          receitaMesAnterior
+        );
+
+        // Atualizar estatísticas
+        setStats({
+          totalAgendamentos: agendamentos.length,
+          agendamentosHoje: agendamentosHoje.length,
+          totalClientes: usuarios.length,
+          totalServicos: servicos.length,
+          receitaMes: receitaMes,
+          agendamentosAbertos: agendamentosPendentes.length,
+          crescimentoAgendamentos,
+          crescimentoClientes,
+          crescimentoReceita
+        });
+
+        // Processar agendamentos recentes (últimos 5, ordenados por data)
+        const agendamentosOrdenados = [...agendamentos]
+          .sort((a, b) => {
+            const dataA = new Date(a.data + ' ' + a.horarioInicio);
+            const dataB = new Date(b.data + ' ' + b.horarioInicio);
+            return dataB - dataA;
+          })
+          .slice(0, 5)
+          .map(a => ({
+            id: a.id,
+            cliente: a.usuarioNome || a.cliente || 'Cliente',
+            servico: a.servico || 'Serviço',
+            data: a.data || '',
+            hora: a.horarioInicio || '',
+            status: a.status || 'Pendente'
+          }));
+
+        setAgendamentosRecentes(agendamentosOrdenados);
+
+        // Processar serviços mais populares
+        const servicosContagem = {};
+        agendamentos.forEach(a => {
+          const nomeServico = a.servico || 'Outros';
+          servicosContagem[nomeServico] = (servicosContagem[nomeServico] || 0) + 1;
+        });
+
+        const totalAgendamentos = agendamentos.length || 1;
+        const servicosPopularesArray = Object.entries(servicosContagem)
+          .map(([nome, quantidade]) => ({
+            nome,
+            quantidade,
+            percentual: Math.round((quantidade / totalAgendamentos) * 100)
+          }))
+          .sort((a, b) => b.quantidade - a.quantidade)
+          .slice(0, 5);
+
+        setServicosPopulares(servicosPopularesArray);
+
+      } catch (error) {
+        console.error('❌ Erro ao carregar dados do dashboard:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     carregarDados();
@@ -135,10 +242,14 @@ const Dashboard = () => {
               <h3>{stats.totalAgendamentos}</h3>
               <p>Total de Agendamentos</p>
             </div>
-            <div className="stat-trend positive">
-              <span className="material-symbols-outlined">trending_up</span>
-              +12%
-            </div>
+            {stats.crescimentoAgendamentos !== 0 && (
+              <div className={`stat-trend ${stats.crescimentoAgendamentos > 0 ? 'positive' : 'negative'}`}>
+                <span className="material-symbols-outlined">
+                  {stats.crescimentoAgendamentos > 0 ? 'trending_up' : 'trending_down'}
+                </span>
+                {stats.crescimentoAgendamentos > 0 ? '+' : ''}{stats.crescimentoAgendamentos}%
+              </div>
+            )}
           </div>
 
           <div className="stat-card success">
@@ -160,10 +271,14 @@ const Dashboard = () => {
               <h3>{stats.totalClientes}</h3>
               <p>Total de Clientes</p>
             </div>
-            <div className="stat-trend positive">
-              <span className="material-symbols-outlined">trending_up</span>
-              +5%
-            </div>
+            {stats.crescimentoClientes !== 0 && (
+              <div className={`stat-trend ${stats.crescimentoClientes > 0 ? 'positive' : 'negative'}`}>
+                <span className="material-symbols-outlined">
+                  {stats.crescimentoClientes > 0 ? 'trending_up' : 'trending_down'}
+                </span>
+                {stats.crescimentoClientes > 0 ? '+' : ''}{stats.crescimentoClientes}%
+              </div>
+            )}
           </div>
 
           <div className="stat-card warning" onClick={() => handleNavegacao('servicos')}>
@@ -184,10 +299,14 @@ const Dashboard = () => {
               <h3>R$ {stats.receitaMes.toFixed(2).replace('.', ',')}</h3>
               <p>Receita do Mês</p>
             </div>
-            <div className="stat-trend positive">
-              <span className="material-symbols-outlined">trending_up</span>
-              +18%
-            </div>
+            {stats.crescimentoReceita !== 0 && (
+              <div className={`stat-trend ${stats.crescimentoReceita > 0 ? 'positive' : 'negative'}`}>
+                <span className="material-symbols-outlined">
+                  {stats.crescimentoReceita > 0 ? 'trending_up' : 'trending_down'}
+                </span>
+                {stats.crescimentoReceita > 0 ? '+' : ''}{stats.crescimentoReceita}%
+              </div>
+            )}
           </div>
         </div>
 
@@ -213,10 +332,14 @@ const Dashboard = () => {
                   </div>
                   <div className="agendamento-details">
                     <div className="data-hora">
-                      {agendamento.data.split('-').reverse().join('/')} às {agendamento.hora}
+                      {agendamento.data ? (
+                        agendamento.data.includes('-') 
+                          ? agendamento.data.split('-').reverse().join('/')
+                          : agendamento.data
+                      ) : 'Data não disponível'} às {agendamento.hora || 'N/A'}
                     </div>
-                    <span className={`status-badge ${agendamento.status.toLowerCase()}`}>
-                      {agendamento.status}
+                    <span className={`status-badge ${(agendamento.status || 'pendente').toLowerCase()}`}>
+                      {agendamento.status || 'Pendente'}
                     </span>
                   </div>
                 </div>

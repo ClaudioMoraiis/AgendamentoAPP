@@ -25,6 +25,8 @@ export const useAppNavigation = () => {
     adminClientes: () => navigate(ROUTES.GERENCIAMENTO_CLIENTES),
     adminAgendamentos: () => navigate(ROUTES.GERENCIAMENTO_AGENDAMENTOS),
     adminProfissionais: () => navigate(ROUTES.GERENCIAMENTO_PROFISSIONAIS),
+    adminEspecialidades: () => navigate(ROUTES.GERENCIAMENTO_ESPECIALIDADES),
+    adminHorarios: () => navigate(ROUTES.GERENCIAMENTO_HORARIOS),
     
     // Navegação genérica
     back: () => navigate(-1),
@@ -59,6 +61,8 @@ export const getPageTitle = (pathname) => {
     [ROUTES.GERENCIAMENTO_CLIENTES]: 'Gerenciar Clientes',
     [ROUTES.GERENCIAMENTO_AGENDAMENTOS]: 'Gerenciar Agendamentos',
     [ROUTES.GERENCIAMENTO_PROFISSIONAIS]: 'Gerenciar Profissionais',
+    [ROUTES.GERENCIAMENTO_ESPECIALIDADES]: 'Gerenciar Especialidades',
+    [ROUTES.GERENCIAMENTO_HORARIOS]: 'Gerenciar Horários',
   };
 
   return routeTitles[pathname] || 'Agendamento';

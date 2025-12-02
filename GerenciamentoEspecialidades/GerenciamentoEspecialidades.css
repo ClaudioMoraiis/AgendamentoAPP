@@ -1,0 +1,283 @@
+/* Container Principal */
+.ge-main {
+  flex: 1;
+  padding: 2rem;
+  background: #f6f7f8;
+  min-height: 100vh;
+}
+
+.ge-main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+.ge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ge-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.ge-btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #137fec 0%, #0c5bb8 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(19, 127, 236, 0.2);
+}
+
+.ge-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(19, 127, 236, 0.3);
+}
+
+.ge-btn-primary .material-symbols-outlined {
+  font-size: 1.25rem;
+}
+
+/* Card da Tabela */
+.ge-table-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Tabela */
+.ge-table-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ge-table-card thead {
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.ge-table-card th {
+  text-align: left;
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ge-table-card td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.ge-table-card tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ge-table-card tbody tr {
+  transition: background-color 0.15s;
+}
+
+.ge-table-card tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.ge-link-edit {
+  color: #137fec;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.ge-link-edit:hover {
+  background-color: #eff6ff;
+  text-decoration: underline;
+}
+
+/* Modal */
+.ge-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.ge-modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.ge-modal h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.ge-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ge-modal label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.ge-modal input {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ge-modal input:focus {
+  outline: none;
+  border-color: #137fec;
+  box-shadow: 0 0 0 3px rgba(19, 127, 236, 0.1);
+}
+
+/* Botões do Modal */
+.ge-modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.ge-modal-buttons button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ge-modal-buttons .cancelar {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.ge-modal-buttons .cancelar:hover {
+  background: #e5e7eb;
+}
+
+.ge-modal-buttons .salvar {
+  background: linear-gradient(135deg, #137fec 0%, #0c5bb8 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(19, 127, 236, 0.2);
+}
+
+.ge-modal-buttons .salvar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(19, 127, 236, 0.3);
+}
+
+.ge-modal-buttons .excluir {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+.ge-modal-buttons .excluir:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Notificação Toast */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .ge-main {
+    padding: 1rem;
+  }
+
+  .ge-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ge-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .ge-btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ge-table-card {
+    overflow-x: auto;
+  }
+
+  .ge-table-card table {
+    min-width: 600px;
+  }
+
+  .ge-modal {
+    padding: 1.5rem;
+  }
+
+  .ge-modal-buttons {
+    flex-direction: column;
+  }
+
+  .ge-modal-buttons button {
+    width: 100%;
+  }
+}

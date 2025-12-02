@@ -12,6 +12,8 @@ import GerenciamentoServicos from "./GerenciamentoServicos/GerenciamentoServicos
 import GerenciamentoClientes from "./GerenciamentoClientes/GerenciamentoClientes";
 import GerenciamentoAgendamentos from "./GerenciamentoAgendamentos/GerenciamentoAgendamentos";
 import GerenciamentoProfissionais from "./GerenciamentoProfissionais/GerenciamentoProfissionais";
+import GerenciamentoEspecialidades from "./GerenciamentoEspecialidades/GerenciamentoEspecialidades";
+import GerenciamentoHorarios from "./GerenciamentoHorarios/GerenciamentoHorarios";
 import {
   RedirectToAdminServicos,
   RedirectToAdminClientes,
@@ -48,6 +50,8 @@ function App() {
         <Route path={ROUTES.GERENCIAMENTO_CLIENTES} element={<GerenciamentoClientes />} />
         <Route path={ROUTES.GERENCIAMENTO_AGENDAMENTOS} element={<GerenciamentoAgendamentos />} />
         <Route path={ROUTES.GERENCIAMENTO_PROFISSIONAIS} element={<GerenciamentoProfissionais />} />
+        <Route path={ROUTES.GERENCIAMENTO_ESPECIALIDADES} element={<GerenciamentoEspecialidades />} />
+        <Route path={ROUTES.GERENCIAMENTO_HORARIOS} element={<GerenciamentoHorarios />} />
       </Routes>
     </Router>
   );

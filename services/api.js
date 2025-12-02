@@ -337,6 +337,33 @@ export const apiService = {
       makeAuthenticatedRequest(`/agendamento/${id}`, {
         method: "DELETE",
       }),
+
+    // Buscar horários disponíveis
+    horariosDisponiveis: (profissionalId, servicoId, data) => {
+      const params = new URLSearchParams({
+        profissionalId: String(profissionalId),
+        servicoId: String(servicoId),
+        data: data
+      });
+      return makeAuthenticatedRequest(`/agendamento/horarios-disponiveis?${params.toString()}`);
+    },
+
+    // Cadastrar agendamento (cliente)
+    cadastrar: (agendamentoData) =>
+      makeAuthenticatedRequest("/agendamento/register", {
+        method: "POST",
+        body: JSON.stringify(agendamentoData),
+      }),
+
+    // Listar agendamentos por cliente
+    listarPorCliente: (usuarioId) =>
+      makeAuthenticatedRequest(`/agendamento/list/${usuarioId}`),
+
+    // Cancelar agendamento por ID
+    cancelar: (id) =>
+      makeAuthenticatedRequest(`/agendamento/cancel/${id}`, {
+        method: "PUT",
+      }),
   },
 
   // Serviços
@@ -425,6 +452,64 @@ export const apiService = {
   especialidades: {
     // Listar especialidades (admin - requer token)
     listar: () => makeAuthenticatedRequest("/especialidade/listar"),
+
+    // Criar especialidade (admin - requer token)
+    criar: (especialidadeData) => {
+      console.log('➕ API especialidade cadastrar - Payload:', especialidadeData);
+      return makeAuthenticatedRequest("/especialidade/cadastrar", {
+        method: "POST",
+        body: JSON.stringify(especialidadeData),
+      });
+    },
+
+    // Atualizar especialidade (admin)
+    atualizar: (id, especialidadeData) => {
+      console.log('🔄 API especialidade atualizar - ID:', id, 'Payload:', especialidadeData);
+      return makeAuthenticatedRequest(`/especialidade/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(especialidadeData),
+      });
+    },
+
+    // Deletar especialidade (admin)
+    deletar: (id) => {
+      console.log('🗑️ API especialidade deletar - ID:', id);
+      return makeAuthenticatedRequest(`/especialidade/${id}`, {
+        method: "DELETE",
+      });
+    },
+  },
+
+  // Horários de Profissionais
+  horarios: {
+    // Listar horários (admin - requer token)
+    listar: () => makeAuthenticatedRequest("/profissional-horario/list"),
+
+    // Criar horário (admin - requer token)
+    criar: (horarioData) => {
+      console.log('➕ API horário cadastrar - Payload:', horarioData);
+      return makeAuthenticatedRequest("/profissional-horario/register", {
+        method: "POST",
+        body: JSON.stringify(horarioData),
+      });
+    },
+
+    // Atualizar horário (admin)
+    atualizar: (id, horarioData) => {
+      console.log('🔄 API horário atualizar - ID:', id, 'Payload:', horarioData);
+      return makeAuthenticatedRequest(`/profissional-horario/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(horarioData),
+      });
+    },
+
+    // Deletar horário (admin)
+    deletar: (id) => {
+      console.log('🗑️ API horário deletar - ID:', id);
+      return makeAuthenticatedRequest(`/profissional-horario/${id}`, {
+        method: "DELETE",
+      });
+    },
   },
 
   // Dashboard/Estatísticas (admin)

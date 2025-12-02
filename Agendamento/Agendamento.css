@@ -10,22 +10,41 @@
   border: none;
   padding: 1rem 0.5rem;
 }
+.agendamento-calendar-component .react-calendar__month-view__days {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+}
 .agendamento-calendar-component .react-calendar__tile {
   border-radius: 9999px;
   height: 2.5rem;
+  width: 2.5rem;
   max-width: 2.5rem;
   font-size: 1rem;
   margin: 0.1rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .agendamento-calendar-component .react-calendar__month-view__weekdays {
   font-weight: bold;
   color: #6b7280;
   text-align: center;
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
 }
-.agendamento-calendar-component .react-calendar__tile--active,
-.agendamento-calendar-component .react-calendar__tile--now {
+.agendamento-calendar-component .react-calendar__month-view__weekdays__weekday {
+  text-align: center;
+  padding: 0.5rem;
+}
+.agendamento-calendar-component .react-calendar__tile--active {
   background: #137fec;
   color: #fff;
+}
+.agendamento-calendar-component .react-calendar__tile--now {
+  background: transparent;
+  color: #137fec;
+  font-weight: bold;
+  border: 2px solid #137fec;
 }
 .agendamento-calendar-component .react-calendar__tile:disabled {
   color: #9ca3af;
@@ -347,4 +366,60 @@
 }
 .agendamento-reagendar-btn:hover {
   background: rgba(19, 127, 236, 0.2);
+}
+.agendamento-error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+.agendamento-error .material-symbols-outlined {
+  font-size: 1.25rem;
+}
+.agendamento-info-text {
+  text-align: center;
+  color: #6b7280;
+  padding: 2rem 1rem;
+  font-size: 0.875rem;
+}
+.agendamento-empty-text {
+  text-align: center;
+  color: #9ca3af;
+  padding: 2rem 1rem;
+  font-size: 0.875rem;
+}
+.agendamento-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  gap: 1rem;
+  color: #6b7280;
+}
+.agendamento-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid #e5e7eb;
+  border-top-color: #137fec;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.agendamento-agendar-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.agendamento-select:disabled,
+.agendamento-horario-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

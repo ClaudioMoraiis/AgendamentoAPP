@@ -35,10 +35,17 @@ const Login = () => {
       let token = null;
       
       if (response.Sucesso && typeof response.Sucesso === 'string') {
-        // Extrai o token da string "Login realizado com sucesso\nToken: {jwt}"
-        const match = response.Sucesso.match(/Token:\s*(.+)/);
-        if (match && match[1]) {
-          token = match[1].trim();
+        // Extrai o token da string "Login realizado com sucesso\nToken: {jwt} ID :{id}"
+        const tokenMatch = response.Sucesso.match(/Token:\s*([^\s]+)/);
+        if (tokenMatch && tokenMatch[1]) {
+          token = tokenMatch[1].trim();
+        }
+        
+        // Extrai o ID do usuário
+        const idMatch = response.Sucesso.match(/ID\s*:(\d+)/);
+        if (idMatch && idMatch[1]) {
+          localStorage.setItem("usuarioId", idMatch[1].trim());
+          console.log('💾 usuarioId salvo no localStorage:', idMatch[1].trim());
         }
       } else if (response.token) {
         token = response.token;
@@ -61,6 +68,15 @@ const Login = () => {
       } else {
         console.warn('⚠️ Token não encontrado na resposta do login');
         console.warn('Propriedades disponíveis:', Object.keys(response || {}));
+      }
+      
+      // Salva o usuarioId se vier na resposta
+      if (response.usuarioId) {
+        localStorage.setItem("usuarioId", response.usuarioId);
+        console.log('💾 usuarioId salvo no localStorage:', response.usuarioId);
+      } else if (response.id) {
+        localStorage.setItem("usuarioId", response.id);
+        console.log('💾 usuarioId (id) salvo no localStorage:', response.id);
       }
       
       // Verifica se é o email administrativo específico
