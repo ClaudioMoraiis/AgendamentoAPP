@@ -11,6 +11,7 @@ export const ROUTES = {
   SERVICOS: '/servicos',
   AGENDAMENTO: '/agendamento',
   MEUS_AGENDAMENTOS: '/meus-agendamentos',
+  CHAT_CLIENTE: '/chat',
   
   // Rotas administrativas
   DASHBOARD: '/admin/dashboard',
@@ -20,6 +21,7 @@ export const ROUTES = {
   GERENCIAMENTO_PROFISSIONAIS: '/admin/profissionais',
   GERENCIAMENTO_ESPECIALIDADES: '/admin/especialidades',
   GERENCIAMENTO_HORARIOS: '/admin/horarios',
+  CHAT: '/admin/chat',
 };
 
 // Configuração da navegação para diferentes tipos de usuários
@@ -39,6 +41,11 @@ export const NAVIGATION_ITEMS = {
       label: 'Meus Agendamentos',
       path: ROUTES.MEUS_AGENDAMENTOS,
       icon: '📋'
+    },
+    {
+      label: 'Chat',
+      path: ROUTES.CHAT_CLIENTE,
+      icon: 'chat'
     }
   ],
   ADMIN: [
@@ -76,6 +83,11 @@ export const NAVIGATION_ITEMS = {
       label: 'Horários',
       path: ROUTES.GERENCIAMENTO_HORARIOS,
       icon: 'schedule'
+    },
+    {
+      label: 'Chat',
+      path: ROUTES.CHAT,
+      icon: 'chat'
     }
   ]
 };
