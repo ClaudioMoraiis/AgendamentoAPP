@@ -71,18 +71,56 @@ const Login = () => {
       }
       
       // Salva o usuarioId se vier na resposta
+      let usuarioId = null;
       if (response.usuarioId) {
-        localStorage.setItem("usuarioId", response.usuarioId);
-        console.log('💾 usuarioId salvo no localStorage:', response.usuarioId);
+        usuarioId = response.usuarioId;
+        localStorage.setItem("usuarioId", usuarioId);
+        console.log('💾 usuarioId salvo no localStorage:', usuarioId);
       } else if (response.id) {
-        localStorage.setItem("usuarioId", response.id);
-        console.log('💾 usuarioId (id) salvo no localStorage:', response.id);
+        usuarioId = response.id;
+        localStorage.setItem("usuarioId", usuarioId);
+        console.log('💾 usuarioId (id) salvo no localStorage:', usuarioId);
       }
       
-      // Verifica se é o email administrativo específico
-      if (email.toUpperCase() === "ADM@GMAIL.COM") {
+      // Busca o role real do backend
+      let isAdmin = false;
+      if (usuarioId) {
+        try {
+          const roleResponse = await apiService.usuario.getRole(usuarioId);
+          console.log('🎭 Role do backend:', roleResponse);
+          
+          // Verifica se é admin baseado na resposta do backend
+          const role = roleResponse.role || roleResponse.tipo || roleResponse;
+          isAdmin = String(role).toUpperCase() === 'ADMIN';
+          
+          localStorage.setItem("role", isAdmin ? "admin" : "cliente");
+          console.log('🔐 Usuário é admin?', isAdmin);
+        } catch (roleError) {
+          console.warn('⚠️ Erro ao buscar role, usando validação por email:', roleError);
+          // Fallback: verifica pelo email se a API falhar
+          isAdmin = email.toUpperCase() === "ADM@GMAIL.COM";
+          localStorage.setItem("role", isAdmin ? "admin" : "cliente");
+        }
+      } else {
+        // Fallback: verifica pelo email se não tiver ID
+        isAdmin = email.toUpperCase() === "ADM@GMAIL.COM";
+        localStorage.setItem("role", isAdmin ? "admin" : "cliente");
+      }
+      
+      // Atualiza status para ONLINE após login bem-sucedido
+      if (usuarioId) {
+        try {
+          await apiService.usuarios.atualizarStatusOnline(usuarioId, true);
+          console.log('🟢 Status atualizado para ONLINE');
+        } catch (onlineError) {
+          console.warn('⚠️ Erro ao atualizar status online:', onlineError);
+          // Não interrompe o fluxo de login
+        }
+      }
+      
+      // Redireciona baseado no role real
+      if (isAdmin) {
         console.log('👑 Usuário administrativo detectado, redirecionando para dashboard');
-        localStorage.setItem("role", "admin");
         // Antes de redirecionar, tenta carregar lista de profissionais para uso no admin
         try {
           const profsResp = await apiService.profissionais.listar();
@@ -99,7 +137,6 @@ const Login = () => {
         navigateTo.dashboard(); // Redireciona para o dashboard administrativo
       } else {
         console.log('👤 Usuário cliente, redirecionando para serviços');
-        localStorage.setItem("role", "cliente");
         navigateTo.servicos(); // Leva para página de serviços
       }
       

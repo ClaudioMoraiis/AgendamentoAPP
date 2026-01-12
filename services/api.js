@@ -196,6 +196,21 @@ export const apiService = {
         body: JSON.stringify(senhaData),
       }),
 
+    // Atualizar status online/offline
+    atualizarStatusOnline: async (userId, isOnline) => {
+      console.log(`🟢 API - Atualizar status online do usuário ${userId}: ${isOnline}`);
+      try {
+        const resultado = await makeAuthenticatedRequest(`/usuario/online/${userId}?mOnline=${isOnline}`, {
+          method: "PATCH"
+        });
+        console.log(`✅ Status atualizado com sucesso para ${userId}:`, resultado);
+        return resultado;
+      } catch (error) {
+        console.error(`❌ Erro ao atualizar status para ${userId}:`, error);
+        throw error;
+      }
+    },
+
     // Recuperar senha (público - não precisa de token)
     recuperarSenha: (email) => {
       const params = new URLSearchParams({
@@ -218,7 +233,11 @@ export const apiService = {
       }),
 
     // Listar todos os usuários (admin - requer token)
-    listar: () => makeAuthenticatedRequest("/usuario/listar"),
+    listar: async () => {
+      const resultado = await makeAuthenticatedRequest("/usuario/listar");
+      console.log('📋 DEBUG API - Resposta completa de /usuario/listar:', JSON.stringify(resultado, null, 2));
+      return resultado;
+    },
 
     // Alterar usuário (admin - requer token)
     alterar: (id, userData) => {
@@ -512,6 +531,29 @@ export const apiService = {
     },
   },
 
+  // Usuário/Autenticação
+  usuario: {
+    /**
+     * Busca dados do usuário atual (logado) a partir do token
+     * Retorna informações incluindo se é admin
+     * @returns {Promise} - Retorna objeto do usuário
+     */
+    me: () => {
+      console.log('👤 API Usuario - Buscar dados do usuário atual');
+      return makeAuthenticatedRequest('/api/usuario/me');
+    },
+
+    /**
+     * Busca o role (tipo) do usuário pelo ID
+     * @param {number} userId - ID do usuário
+     * @returns {Promise} - Retorna o role do usuário (ADMIN, CLIENTE, etc)
+     */
+    getRole: (userId) => {
+      console.log(`🎭 API Usuario - Buscar role do usuário ID: ${userId}`);
+      return makeAuthenticatedRequest(`/usuario/role/${userId}`);
+    },
+  },
+
   // Dashboard/Estatísticas (admin)
   dashboard: {
     // Estatísticas gerais
@@ -527,6 +569,104 @@ export const apiService = {
     // Receita por período
     receita: (periodo) =>
       makeAuthenticatedRequest(`/dashboard/receita?periodo=${periodo}`),
+  },
+
+  // Chat/Mensagens
+  chat: {
+    /**
+     * Lista mensagens de uma conversa com paginação
+     * @param {number} clienteId - ID do cliente
+     * @param {number} usuarioId - ID do usuário logado
+     * @param {number} page - Número da página (padrão: 0)
+     * @param {number} size - Tamanho da página (padrão: 20)
+     * @returns {Promise} - Retorna objeto com mensagens paginadas
+     */
+    listarMensagens: (clienteId, usuarioId, page = 0, size = 20) => {
+      console.log(`📬 API Chat - Listar mensagens do cliente ${clienteId} (usuário ${usuarioId}, página ${page}, tamanho ${size})`);
+      return makeAuthenticatedRequest(
+        `/mensagem/mensagens?mClienteId=${clienteId}&mUsuarioId=${usuarioId}&mPage=${page}&mSize=${size}`
+      );
+    },
+
+    /**
+     * Cria/envia uma nova mensagem
+     * @param {Object} mensagemData - Dados da mensagem
+     * @param {string} mensagemData.conteudo - Conteúdo da mensagem
+     * @param {number} mensagemData.remetenteId - ID do remetente
+     * @param {number} mensagemData.destinatarioId - ID do destinatário
+     * @returns {Promise}
+     */
+    enviarMensagem: (mensagemData) => {
+      console.log('📤 API Chat - Enviar mensagem:', mensagemData);
+      return makeAuthenticatedRequest('/mensagem/cadastrar', {
+        method: 'POST',
+        body: JSON.stringify(mensagemData),
+      });
+    },
+
+    /**
+     * Marca uma mensagem específica como lida
+     * @param {number} mensagemId - ID da mensagem
+     * @param {number} idUsuarioDestino - ID do usuário destinatário
+     * @returns {Promise}
+     */
+    marcarComoLida: (mensagemId, idUsuarioDestino) => {
+      console.log(`✅ API Chat - Marcar mensagem ${mensagemId} como lida para usuário ${idUsuarioDestino}`);
+      return makeAuthenticatedRequest(
+        `/mensagem/${mensagemId}/${idUsuarioDestino}/lida`,
+        { method: 'PATCH' }
+      );
+    },
+
+    /**
+     * Marca várias mensagens de um cliente como lidas
+     * @param {number} idCliente - ID do cliente
+     * @returns {Promise}
+     */
+    marcarVariasComoLidas: (idCliente) => {
+      console.log(`✅ API Chat - Marcar todas mensagens do cliente ${idCliente} como lidas`);
+      return makeAuthenticatedRequest(
+        `/mensagem/lidas?idCliente=${idCliente}`,
+        { method: 'PUT' }
+      );
+    },
+
+    /**
+     * Deleta uma mensagem específica
+     * @param {number} mensagemId - ID da mensagem
+     * @param {number} userId - ID do usuário logado
+     * @returns {Promise}
+     */
+    deletarMensagem: (mensagemId, userId) => {
+      console.log(`🗑️ API Chat - Deletar mensagem ${mensagemId} (usuário ${userId})`);
+      return makeAuthenticatedRequest(
+        `/mensagem/${mensagemId}/${userId}`,
+        { method: 'DELETE' }
+      );
+    },
+
+    /**
+     * Deletar todas as mensagens de uma conversa (cliente)
+     * @param {number} idCliente - ID do cliente
+     * @param {number} userId - ID do usuário logado
+     * @returns {Promise}
+     */
+    deletarVariasMensagens: (idCliente, userId) => {
+      console.log(`🗑️ API Chat - Deletar todas mensagens do cliente ${idCliente} (usuário ${userId})`);
+      return makeAuthenticatedRequest(
+        `/mensagem/deletarVarias/${idCliente}/${userId}`,
+        { method: 'DELETE' }
+      );
+    },
+
+    /**
+     * Conta total de mensagens não lidas
+     * @returns {Promise<{total: number}>}
+     */
+    contarNaoLidas: () => {
+      console.log('📊 API Chat - Contar mensagens não lidas');
+      return makeAuthenticatedRequest('/mensagem/nao-lidas/count');
+    },
   },
 };
 

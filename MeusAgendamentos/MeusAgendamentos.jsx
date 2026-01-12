@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import PageLayout from "../components/PageLayout/PageLayout";
+import LayoutPrincipal from "../LayoutPrincipal/LayoutPrincipal";
 import { ROUTES } from "../constants/routes";
 import { apiService } from "../services/api";
 import "./MeusAgendamentos.css";
@@ -106,7 +106,7 @@ const MeusAgendamentos = () => {
   };
 
   return (
-    <PageLayout userType="CLIENT" onLogout={handleLogout}>
+    <LayoutPrincipal paginaAtiva="meus-agendamentos">
       <div className="meusagend-content">
         {mensagemSucesso && (
           <div className="meusagend-sucesso">
@@ -231,7 +231,7 @@ const MeusAgendamentos = () => {
           </div>
         </div>
       )}
-    </PageLayout>
+    </LayoutPrincipal>
   );
 };
 

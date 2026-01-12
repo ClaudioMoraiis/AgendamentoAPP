@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { NAVIGATION_ITEMS } from '../../constants/routes';
+import ChatNotificationBadge from '../ChatNotificationBadge/ChatNotificationBadge';
 import './HeaderNavigation.css';
 
 const HeaderNavigation = ({ 
@@ -33,6 +34,7 @@ const HeaderNavigation = ({
               to={item.path}
             >
               {item.label}
+              {item.path === '/chat' && <ChatNotificationBadge />}
             </Link>
           ))}
         </nav>

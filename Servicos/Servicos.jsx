@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import PageLayout from "../components/PageLayout/PageLayout";
+import LayoutPrincipal from "../LayoutPrincipal/LayoutPrincipal";
 import { useAppNavigation } from "../hooks/useAppNavigation";
 import { ROUTES } from "../constants/routes";
 import { apiService } from "../services/api";
@@ -60,7 +60,7 @@ const Servicos = () => {
   };
 
   return (
-    <PageLayout userType="CLIENT" onLogout={handleLogout}>
+    <LayoutPrincipal paginaAtiva="servicos-cliente">
       <div className="servicos-content">
         {loading ? (
           <div className="servicos-loading">
@@ -110,7 +110,7 @@ const Servicos = () => {
           </div>
         )}
       </div>
-    </PageLayout>
+    </LayoutPrincipal>
   );
 };
 

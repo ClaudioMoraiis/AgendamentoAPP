@@ -15,6 +15,7 @@ import GerenciamentoProfissionais from "./GerenciamentoProfissionais/Gerenciamen
 import GerenciamentoEspecialidades from "./GerenciamentoEspecialidades/GerenciamentoEspecialidades";
 import GerenciamentoHorarios from "./GerenciamentoHorarios/GerenciamentoHorarios";
 import Chat from "./Chat/Chat";
+import { ChatProvider } from "./contexts/ChatContext";
 import {
   RedirectToAdminServicos,
   RedirectToAdminClientes,
@@ -26,36 +27,38 @@ import {
 function App() {
   return (
     <Router>
-      <Routes>
-        {/* Rotas públicas */}
-        <Route path={ROUTES.LOGIN} element={<Login />} />
-        <Route path={ROUTES.CADASTRO} element={<Cadastro />} />
-        <Route path={ROUTES.RECUPERAR_SENHA} element={<RecuperarSenha />} />
-        <Route path={ROUTES.ALTERAR_SENHA} element={<AlterarSenha />} />
-        
-        {/* Rotas do cliente */}
-        <Route path={ROUTES.SERVICOS} element={<Servicos />} />
-        <Route path={ROUTES.AGENDAMENTO} element={<Agendamento />} />
-        <Route path={ROUTES.MEUS_AGENDAMENTOS} element={<MeusAgendamentos />} />
-        <Route path={ROUTES.CHAT_CLIENTE} element={<Chat />} />
-        
-        {/* Rotas de compatibilidade (redirecionamento automático) */}
-        <Route path="/agendamentoCliente" element={<RedirectToAgendamento />} />
-        <Route path="/gerenciamento-servicos" element={<RedirectToAdminServicos />} />
-        <Route path="/gerenciamento-clientes" element={<RedirectToAdminClientes />} />
-        <Route path="/gerenciamento-agendamentos" element={<RedirectToAdminAgendamentos />} />
-        <Route path="/gerenciamento-profissionais" element={<RedirectToAdminProfissionais />} />
-        
-        {/* Rotas administrativas (padrão atual) */}
-        <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
-        <Route path={ROUTES.GERENCIAMENTO_SERVICOS} element={<GerenciamentoServicos />} />
-        <Route path={ROUTES.GERENCIAMENTO_CLIENTES} element={<GerenciamentoClientes />} />
-        <Route path={ROUTES.GERENCIAMENTO_AGENDAMENTOS} element={<GerenciamentoAgendamentos />} />
-        <Route path={ROUTES.GERENCIAMENTO_PROFISSIONAIS} element={<GerenciamentoProfissionais />} />
-        <Route path={ROUTES.GERENCIAMENTO_ESPECIALIDADES} element={<GerenciamentoEspecialidades />} />
-        <Route path={ROUTES.GERENCIAMENTO_HORARIOS} element={<GerenciamentoHorarios />} />
-        <Route path={ROUTES.CHAT} element={<Chat />} />
-      </Routes>
+      <ChatProvider>
+        <Routes>
+          {/* Rotas públicas */}
+          <Route path={ROUTES.LOGIN} element={<Login />} />
+          <Route path={ROUTES.CADASTRO} element={<Cadastro />} />
+          <Route path={ROUTES.RECUPERAR_SENHA} element={<RecuperarSenha />} />
+          <Route path={ROUTES.ALTERAR_SENHA} element={<AlterarSenha />} />
+          
+          {/* Rotas do cliente */}
+          <Route path={ROUTES.SERVICOS} element={<Servicos />} />
+          <Route path={ROUTES.AGENDAMENTO} element={<Agendamento />} />
+          <Route path={ROUTES.MEUS_AGENDAMENTOS} element={<MeusAgendamentos />} />
+          <Route path={ROUTES.CHAT_CLIENTE} element={<Chat />} />
+          
+          {/* Rotas de compatibilidade (redirecionamento automático) */}
+          <Route path="/agendamentoCliente" element={<RedirectToAgendamento />} />
+          <Route path="/gerenciamento-servicos" element={<RedirectToAdminServicos />} />
+          <Route path="/gerenciamento-clientes" element={<RedirectToAdminClientes />} />
+          <Route path="/gerenciamento-agendamentos" element={<RedirectToAdminAgendamentos />} />
+          <Route path="/gerenciamento-profissionais" element={<RedirectToAdminProfissionais />} />
+          
+          {/* Rotas administrativas (padrão atual) */}
+          <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
+          <Route path={ROUTES.GERENCIAMENTO_SERVICOS} element={<GerenciamentoServicos />} />
+          <Route path={ROUTES.GERENCIAMENTO_CLIENTES} element={<GerenciamentoClientes />} />
+          <Route path={ROUTES.GERENCIAMENTO_AGENDAMENTOS} element={<GerenciamentoAgendamentos />} />
+          <Route path={ROUTES.GERENCIAMENTO_PROFISSIONAIS} element={<GerenciamentoProfissionais />} />
+          <Route path={ROUTES.GERENCIAMENTO_ESPECIALIDADES} element={<GerenciamentoEspecialidades />} />
+          <Route path={ROUTES.GERENCIAMENTO_HORARIOS} element={<GerenciamentoHorarios />} />
+          <Route path={ROUTES.CHAT} element={<Chat />} />
+        </Routes>
+      </ChatProvider>
     </Router>
   );
 }

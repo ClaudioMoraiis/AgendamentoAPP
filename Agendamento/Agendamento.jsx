@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import HeaderNavigation from "../components/HeaderNavigation/HeaderNavigation";
+import LayoutPrincipal from "../LayoutPrincipal/LayoutPrincipal";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { apiService } from "../services/api";
@@ -136,12 +136,7 @@ const Agendamento = () => {
   };
 
   return (
-    <div className="agendamento-root">
-      <HeaderNavigation 
-        userType="CLIENT" 
-        onLogout={handleLogout}
-      />
-    <main className="agendamento-main">
+    <LayoutPrincipal paginaAtiva="agendamento-cliente">
       <div className="agendamento-card">
         <h2 className="agendamento-section-title">Agendar Horário</h2>
         
@@ -267,8 +262,7 @@ const Agendamento = () => {
           </div>
         )}
       </div>
-    </main>
-  </div>
+    </LayoutPrincipal>
   );
 };
 

@@ -211,6 +211,16 @@
   white-space: nowrap;
 }
 
+/* Negrito quando tem mensagens não lidas */
+.chat-item.has-unread .chat-item-header h4 {
+  font-weight: 700;
+}
+
+.chat-item.has-unread .chat-item-preview p {
+  font-weight: 600;
+  color: #333;
+}
+
 .chat-time {
   font-size: 12px;
   color: #999;
@@ -370,9 +380,13 @@
 }
 
 .message.sent .message-content {
-  background: #2196F3;
-  color: #fff;
+  background: #2196F3 !important;
+  color: #fff !important;
   border-bottom-right-radius: 4px;
+  min-height: 40px !important;
+  min-width: 80px !important;
+  display: block !important;
+  visibility: visible !important;
 }
 
 .message.received .message-content {
@@ -411,6 +425,20 @@
 
 .message-status {
   font-size: 14px !important;
+}
+
+.message-status-icon {
+  font-size: 14px;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+.message-status-icon.delivered {
+  color: #999;
+}
+
+.message-status-icon.read {
+  color: #4fc3f7;
 }
 
 /* Input de mensagem */
@@ -722,4 +750,90 @@
 
 .chat-sidebar-header {
   flex-shrink: 0;
+}
+
+/* Modal de confirmação */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 90%;
+}
+
+.modal-content h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.modal-content p {
+  margin: 0 0 20px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-cancel,
+.btn-delete {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.btn-cancel:hover {
+  background: #e0e0e0;
+}
+
+.btn-delete {
+  background: #ff4444;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #cc0000;
+}
+
+/* Swipe para deletar */
+.message-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.delete-message-btn {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
