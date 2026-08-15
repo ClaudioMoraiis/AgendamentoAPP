@@ -1,6 +1,7 @@
 // Serviço de WebSocket para Chat em Tempo Real com STOMP + SockJS
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { WS_CHAT_URL } from '../constants/api';
 
 class WebSocketService {
   constructor() {
@@ -30,7 +31,7 @@ class WebSocketService {
       // Cria cliente STOMP
       this.client = new Client({
         // Usa SockJS como WebSocket fallback
-        webSocketFactory: () => new SockJS('http://localhost:8080/ws-chat'),
+        webSocketFactory: () => new SockJS(WS_CHAT_URL),
         
         // Headers de conexão (inclui token se fornecido)
         connectHeaders: token ? {

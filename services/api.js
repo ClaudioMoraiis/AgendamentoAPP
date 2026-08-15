@@ -1,5 +1,4 @@
-// Configuração base da API
-const API_BASE_URL = "http://localhost:8080";
+import { API_BASE_URL } from "../constants/api";
 
 // Função para requisições que não precisam de autenticação (login, cadastro)
 const makePublicRequest = async (endpoint, options = {}) => {

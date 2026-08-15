@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { apiService } from '../services/api';
+import { API_BASE_URL } from '../constants/api';
 
 const OnlineStatusContext = createContext(null);
 
@@ -143,7 +144,7 @@ export const OnlineStatusProvider = ({ children }) => {
     // 4. Detecta quando usuário fecha aba/navegador
     const handleBeforeUnload = () => {
       const token = localStorage.getItem('authToken');
-      const url = `http://localhost:8080/usuario/online/${usuarioId}?mOnline=false`;
+      const url = `${API_BASE_URL}/usuario/online/${usuarioId}?mOnline=false`;
       
       StatusManager.setOffline(usuarioId);
       

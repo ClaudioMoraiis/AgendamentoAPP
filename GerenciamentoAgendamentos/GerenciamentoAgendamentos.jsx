@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import LayoutPrincipal from "../LayoutPrincipal/LayoutPrincipal";
 import { apiService } from "../services/api";
+import { API_BASE_URL } from "../constants/api";
 import "./GerenciamentoAgendamentos.css";
-
-const API_BASE_URL = "http://localhost:8080";
 
 const servicosComValores = [
   { nome: "Corte de Cabelo", valor: "R$ 45,00", duracao: "30 min" },
@@ -401,7 +400,7 @@ export default function GerenciamentoAgendamentos() {
           usuarioResp = await apiService.usuarios.buscarPorNome(usuarioNome);
         } else {
           // fallback endpoint
-          usuarioResp = await fetch(`http://localhost:8080/usuario/id/${encodeURIComponent(usuarioNome)}`, {
+          usuarioResp = await fetch(`${API_BASE_URL}/usuario/id/${encodeURIComponent(usuarioNome)}`, {
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('authToken')}` }
           }).then(r => r.ok ? r.json() : null);
         }

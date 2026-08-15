@@ -1,10 +1,12 @@
+import { API_BASE_URL } from "../constants/api";
+
 // Teste simples de conectividade com a API
 export const testApiConnection = async () => {
   try {
     console.log("🧪 Testando conectividade com a API...");
     
     // Teste 1: GET simples (não deve dar CORS)
-    const response = await fetch("http://localhost:8080/usuario/cadastrar", {
+    const response = await fetch(`${API_BASE_URL}/usuario/cadastrar`, {
       method: "HEAD", // Só headers, sem body
     });
     
@@ -25,7 +27,7 @@ export const testCORS = async () => {
   try {
     console.log("🌐 Testando CORS...");
     
-    const response = await fetch("http://localhost:8080/usuario/cadastrar", {
+    const response = await fetch(`${API_BASE_URL}/usuario/cadastrar`, {
       method: "OPTIONS",
       headers: {
         "Origin": "http://localhost:5175",
